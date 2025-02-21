@@ -102,7 +102,7 @@ def remove_friend(request, user_id):
     return redirect(request.META.get('HTTP_REFERER', '/')) 
 
 
-
+@login_required(login_url='users:login')
 def friends(request): 
     friends  = list_friends(request.user) 
      
@@ -110,11 +110,12 @@ def friends(request):
     return render(request, 'users/friends.html', context=context) 
 
 
-
+@login_required(login_url='users:login')
 def profile_user(request, username):  
     user = get_object_or_404(User, username=username) 
     profile = get_object_or_404(Profile, user=user) 
     friends  = list_friends(request.user)[:3]
+    
     context = {'profile': profile, 'user': user, 'friends': friends}
 
     return render(request, 'users/user_profile.html', context=context)

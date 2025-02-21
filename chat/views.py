@@ -9,7 +9,7 @@ from django.core.paginator import Paginator
 
 
 
-@login_required
+@login_required(login_url='users:login')
 def create_chat_two_user(request, user_id):  
     first_user = request.user
     second_user = User.objects.get(id=user_id)
@@ -22,7 +22,8 @@ def create_chat_two_user(request, user_id):
     return redirect('chat:chat_two_users', chat_id=chat.id) 
 
 
-@login_required
+
+@login_required(login_url='users:login')
 def chat_two_user(request, chat_id): 
     chat = ChatTwoUser.objects.get(id=chat_id) 
 
@@ -36,10 +37,16 @@ def chat_two_user(request, chat_id):
     page_number = request.GET.get("page", 1)
 
     if histori_chat.exists():
-        paginator = Paginator(histori_chat, 15)  # Show 25 contacts per page.
+        paginator = Paginator(histori_chat, 15)  
 
-        page_obj = paginator.get_page(page_number)
+        page_obj = paginator.get_page(page_number) 
+
+        count_page = paginator.num_pages
 
 
-    context = {'chat_id': chat_id, 'histori_chat': histori_chat, 'page_obj': page_obj}
+    context = {
+        'chat_id': chat_id, 
+        'histori_chat': histori_chat, 
+        'page_obj': page_obj, 
+        'count_page': count_page,}
     return render(request, 'chat/chat_page.html', context=context)

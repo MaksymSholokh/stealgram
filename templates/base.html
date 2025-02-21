@@ -27,9 +27,9 @@
       </div>
         <nav class="right-section">
             <ul>
+              {% if user.is_authenticated %}
                 <li><a href="{% url "users:profile" request.user %}">My profile</a></li>
                 <li><a href="#">Messages</a></li>
-                {% if user.is_authenticated %}
                 <li><a href="{% url 'users:logout' %}">Logout</a></li> 
                 {% else %} 
                 <li><a href="{% url 'users:login' %}">login</a></li>
@@ -41,7 +41,8 @@
 
     {% endblock header %} 
     
-    {% block content %}
+    {% block content %} 
+
     {% endblock content %} 
     
     {% block footer %}

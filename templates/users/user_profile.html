@@ -2,80 +2,38 @@
 {% load profile_tags %}
 
 {% block content %} 
-
-    <div class="profile-container">
-        <!-- Шапка профілю -->
-        <header class="profile-header">
-            <div class="cover-photo">
-                <img src="https://via.placeholder.com/1200x400" alt="Обкладинка">
-            </div>
-            <div class="profile-info">
-                <div class="profile-photo">
-                    <img src="https://via.placeholder.com/150" alt="Фото профілю">
-                </div>
-                <div class="profile-details">
-                    <h1>{{ user.first_name }} {{ user.last_name }}</h1>
-                    <div class="profile-stats">
-                        <span>Count friends {% count_friends user %} </span>
-                        {% comment %} <span>{% count_posts user %}</span> {% endcomment %}
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Основна частина -->
-        <main class="profile-main">
-            <!-- Ліва колонка -->
-            <aside class="profile-sidebar">
-                <div class="sidebar-section">
-                    <h3>Iformation</h3> 
-
-                    <ul> 
-                        <li>{{ profile.about }}</li>
-                        {% if profile.location %}
-                        <li>Location: {{ profile.location }}</li>
-                        {% endif %}
-                    </ul>
-                </div>
-                <div class="sidebar-section">
-                    <h3>Friends</h3>
-                    <div class="friends-grid"> 
-                        {% for friend in friends %}
-                            <div class="friend">
-                                <img src="https://via.placeholder.com/50" alt="#">
-                                <a href="{% url "users:profile" friend.username %}"><span>{{ friend.firs_name }} {{ friend.last_name }}</span></a>
-                            </div>
-                        {% endfor %}
-                        
-                        
-                    </div>
-                </div>
-            </aside>
-
-            <!-- Права колонка (стрічка новин) -->
-            <section class="profile-feed">
-                <div class="post">
-                    <div class="post-header">
-                        <img src="https://via.placeholder.com/40" alt="Автор посту">
-                        <div class="post-author">
-                            <strong>Ім'я Користувача</strong>
-                            <span>2 години тому</span>
-                        </div>
-                    </div>
-                    <div class="post-content">
-                        <p>Це приклад посту на стіні. Тут може бути текст, фото або посилання.</p>
-                        <img src="https://via.placeholder.com/600x300" alt="Фото посту">
-                    </div>
-                    <div class="post-actions">
-                        <button>Подобається</button>
-                        <button>Коментувати</button>
-                        <button>Поділитися</button>
-                    </div>
-                </div>
-            </section>
-        </main>
+<div class="profile-container">
+    <div class="cover-photo"></div>
+    <div class="profile-header">
+        <img src="avatar.jpg" alt="Аватар користувача" class="profile-avatar">
+        <h1 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h1>
     </div>
-
+    <div class="profile-navigation">
+        <button>#</button>
+        <button>#</button>
+        <button>#</button>
+        <button>#</button>
+       
+    </div>
+    <div class="profile-info">
+        <p><strong>Email:</strong> {{ user.email }} </p>
+        
+        <p><strong>About:</strong>{{ profile.about }}</p>
+    </div>
+    <div class="posts-section">
+        <div class="new-post">
+            <textarea placeholder="What`s new?"></textarea>
+            <button>Publish</button>
+        </div>
+        <div class="post">
+            <img src="avatar.jpg" alt="Аватар" class="post-avatar">
+            <div class="post-content">
+                <h4>Ім'я Користувача</h4>
+                <p>Це мій перший пост!</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 

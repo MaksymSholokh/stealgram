@@ -1,0 +1,28 @@
+{% extends "base.html" %} 
+
+
+{% comment %} {% block header %}
+{% endblock header %} {% endcomment %}
+
+{% block content %}
+<div class="main-content">
+    <h2>Welcome back, {{ user.username}}!</h2>
+    <p>This is your homepage. Here, you can see the latest updates from your friends.</p>
+
+    <div class="posts">
+        <div class="post">
+            <h3>Friend 1</h3>
+            <p>Had a great day at the park today!</p>
+        </div>
+        <div class="post">
+            <h3>Friend 2</h3>
+            <p>Just started watching a new series. Highly recommend!</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+
+{% endblock content %}

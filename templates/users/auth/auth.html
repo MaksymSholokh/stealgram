@@ -1,0 +1,31 @@
+{% extends "base.html" %} 
+
+
+{% block content %}
+  <div class="container">
+
+    <form method='Post'>
+    {{ form.as_p }}   
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Login</button>
+    </form> 
+    <h1>  
+        or  
+    </h1> 
+    <h1>  
+        <a href={% url "users:password_reset" %}>forget password</a> 
+    </h1> 
+    <h1>  
+        <a href="{% url "social:begin" "google-oauth2" %}?next=/some_link/">Google</a>
+
+    </h1> 
+    <h1>  
+        <a href="{% url "users:register" %}">register</a>
+    </h1> 
+
+
+  </div>
+
+
+
+{% endblock content %}

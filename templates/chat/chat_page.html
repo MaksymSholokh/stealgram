@@ -1,0 +1,289 @@
+{% extends "base.html" %} 
+
+
+ {% comment %} first version {% endcomment %}
+
+{% comment %} 
+{% block content %}
+
+    <div class="chat-container">
+        <h2>Chat with: <span id="room-name"></span></h2>
+        <div id="chat-box"></div>
+        <div class="chat-input">
+            <input id="message-input" type="text" placeholder="Your message..." autocomplete="off">
+            <button id="send-btn">Send message</button>
+        </div>
+    </div> 
+
+    <script>
+        const roomName = "{{ chat_id }}";
+        document.getElementById("room-name").textContent = roomName;
+
+        const chatSocket = new WebSocket(
+            "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
+        );
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            const chatBox = document.querySelector("#chat-box");
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message");
+
+            if (data.username === "{{ request.user.username }}") {
+                messageElement.classList.add("user-message");
+            } else {
+                messageElement.classList.add("other-message");
+            }
+
+            messageElement.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
+            chatBox.appendChild(messageElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        };
+
+        document.querySelector("#send-btn").onclick = function() {
+            const messageInput = document.querySelector("#message-input");
+            const message = messageInput.value;
+            chatSocket.send(JSON.stringify({
+                "username": "{{ request.user.username }}",
+                "message": message
+            }));
+            messageInput.value = "";
+        };
+    </script>
+
+
+
+
+   
+{% endblock content %} {% endcomment %} 
+
+ {% comment %} beter version 2 {% endcomment %}
+{% comment %} {% block content %}
+<div class="chat-container">
+    <h2>Chat with: <span id="room-name"></span></h2>
+
+    <!-- Блок для повідомлень -->
+    <div id="chat-box" class="chat-box">
+        <div id="loading" class="loading" style="display: none;">Loading...</div>
+        {% for message in page_obj %}
+            <div class="message {% if message.owner == request.user %}user-message{% else %}other-message{% endif %}">
+                <strong>{{ message.owner.username }}:</strong> {{ message.text_message }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Поле вводу повідомлення -->
+    <div class="chat-input">
+        <input id="message-input" type="text" placeholder="Your message..." autocomplete="off">
+        <button id="send-btn">Send</button>
+    </div>
+</div>
+<script>
+    const roomName = "{{ chat_id }}";
+    document.getElementById("room-name").textContent = roomName;
+
+    const chatBox = document.querySelector("#chat-box");
+    const loading = document.querySelector("#loading");
+    let page = 2;  // Починаємо з другої сторінки (перша вже завантажена)
+    let hasMoreMessages = true;
+    let isLoading = false;
+
+    // Функція для завантаження старих повідомлень
+    function loadMoreMessages() {
+        if (!hasMoreMessages || isLoading) return;
+        isLoading = true;
+        loading.style.display = "block";
+
+        const scrollHeightBefore = chatBox.scrollHeight;
+
+        fetch(`?page=${page}`)
+            .then(response => response.text())
+            .then(html => {
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = html;
+
+                const newMessages = tempDiv.querySelectorAll(".message");
+                if (newMessages.length === 0) {
+                    hasMoreMessages = false;
+                } else {
+                    const firstMessage = chatBox.firstChild;
+                    newMessages.forEach(msg => chatBox.insertBefore(msg, firstMessage));
+                    page++;
+                }
+
+                // Відновлення позиції прокрутки
+                chatBox.scrollTop = chatBox.scrollHeight - scrollHeightBefore;
+            })
+            .finally(() => {
+                isLoading = false;
+                loading.style.display = "none";
+            });
+    }
+
+    // Виклик функції при прокручуванні вгору
+    chatBox.addEventListener("scroll", function() {
+        if (chatBox.scrollTop === 0) {
+            loadMoreMessages();
+        }
+    });
+
+    // WebSocket підключення
+    const chatSocket = new WebSocket(
+        "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
+    );
+
+    // Обробка отриманих повідомлень
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("message");
+
+        if (data.username === "{{ request.user.username }}") {
+            messageElement.classList.add("user-message");
+        } else {
+            messageElement.classList.add("other-message");
+        }
+
+        messageElement.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    };
+
+    // Відправка повідомлення
+    document.querySelector("#send-btn").onclick = function() {
+        const messageInput = document.querySelector("#message-input");
+        const message = messageInput.value;
+        if (message.trim() !== "") {
+            chatSocket.send(JSON.stringify({
+                "username": "{{ request.user.username }}",
+                "message": message
+            }));
+            messageInput.value = "";
+        }
+    };
+
+    // Автоматична прокрутка до останнього повідомлення при завантаженні сторінки
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+{% endblock content %} {% endcomment %}
+
+
+
+
+ {% comment %} 
+  almost work 
+  uncorrect broke pagination 
+  time message 
+  {% endcomment %}
+{% block content %}
+
+<div class="chat-container">
+    <h2>Chat with: <span id="room-name"></span></h2>
+
+    <!-- Блок для повідомлень -->
+    <div id="chat-box" class="chat-box">
+        <div id="loading" class="loading" style="display: none;">Loading...</div>
+        {% for message in page_obj reversed %}
+            <div class="message {% if message.owner == request.user %}user-message{% else %}other-message{% endif %}">
+                <strong>{{ message.owner.username }}:</strong> {{ message.text_message }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Поле вводу повідомлення -->
+    <div class="chat-input">
+        <input id="message-input" type="text" placeholder="Your message..." autocomplete="off">
+        <button id="send-btn">Send</button>
+    </div>
+</div>
+
+<script>
+    const roomName = "{{ chat_id }}";
+    document.getElementById("room-name").textContent = roomName;
+
+    const chatBox = document.querySelector("#chat-box");
+    const loading = document.querySelector("#loading");
+
+    let page = 2;  // Починаємо з другої сторінки (перша вже завантажена)
+    let hasMoreMessages = true;
+    let isLoading = false;
+
+    // Функція для завантаження старих повідомлень
+    function loadMoreMessages() {
+        if (!hasMoreMessages || isLoading) return;
+        isLoading = true;
+        loading.style.display = "block";
+
+        const scrollHeightBefore = chatBox.scrollHeight;
+
+        fetch(`?page=${page}`)
+            .then(response => response.text())
+            .then(html => {
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = html;
+
+                const newMessages = tempDiv.querySelectorAll(".message");
+                if (newMessages.length === 0) {
+                    hasMoreMessages = false;
+                } else {
+                    newMessages.forEach(msg => chatBox.insertBefore(msg, chatBox.firstChild));
+                    page++;
+                }
+
+                // Відновлення позиції прокрутки
+                chatBox.scrollTop = chatBox.scrollHeight - scrollHeightBefore;
+            })
+            .finally(() => {
+                isLoading = false;
+                loading.style.display = "none";
+            });
+    }
+
+    // Виклик функції при прокручуванні вгору
+    chatBox.addEventListener("scroll", function() {
+        if (chatBox.scrollTop === 0) {
+            loadMoreMessages();
+        }
+    });
+
+    // WebSocket підключення
+    const chatSocket = new WebSocket(
+        "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
+    );
+
+    // Обробка отриманих повідомлень
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("message");
+
+        if (data.username === "{{ request.user.username }}") {
+            messageElement.classList.add("user-message");
+        } else {
+            messageElement.classList.add("other-message");
+        }
+
+        messageElement.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    };
+
+    // Відправка повідомлення
+    document.querySelector("#send-btn").onclick = function() {
+        const messageInput = document.querySelector("#message-input");
+        const message = messageInput.value;
+        if (message.trim() !== "") {
+            chatSocket.send(JSON.stringify({
+                "username": "{{ request.user.username }}",
+                "message": message
+            }));
+            messageInput.value = "";
+        }
+    };
+
+    // Автоматична прокрутка до останнього повідомлення при завантаженні сторінки
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+
+{% endblock content %} 
+

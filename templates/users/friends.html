@@ -1,0 +1,22 @@
+{% extends "base.html" %} 
+
+
+{% block content %} 
+  {% if friends %}
+  {% for friend in friends %}
+
+      <div class="user-result">
+          <img src="{{ friend.profile_picture_url }}" alt="{{ friend.first_name }} {{ friend.last_name }}" class="profile-picture">
+          <div class="user-info">
+              <a href="{% url "users:profile" friend.username%}"><h3>{{ friend.first_name }} {{ friend.last_name }}</h3></a>
+              <p>{{ friend.location }}</p> 
+                <a href="{% url "chat:create_chat_two_users" friend.id%}">Send message</a> 
+                <a href="{% url "users:remove_friend" friend.id%}" class="view-profile">Remove friend</a> 
+          </div>
+      </div>
+  {% endfor %}
+  {% else %}
+  <p class="no-results">No friends.</p>
+  {% endif %}
+
+{% endblock content %}

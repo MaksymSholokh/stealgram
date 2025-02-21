@@ -1,0 +1,29 @@
+{% extends "base.html" %} 
+
+
+{% block content %}
+    <div class="search-results">
+        {% if search %}
+            {% for user in search %}
+                <div class="user-result">
+                    <img src="{{ user.profile_picture_url }}" alt="{{ user.first_name }} {{ user.last_name }}" class="profile-picture">
+                    <div class="user-info">
+                        <a href="#"><h3>{{ user.first_name }} {{ user.last_name }}</h3></a>
+                        <p>{{ user.location }}</p> 
+
+                      
+                        
+                            {% if not user  in friends  %}
+                                <a href="{% url "users:add_friend" user.id%}" class="view-profile">Add friend</a> 
+                            {% else %}  
+                                <a href="{% url "users:remove_friend" user.id%}" class="view-profile">Remove friend</a> 
+                            {% endif %} 
+
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-results">No users found.</p>
+        {% endif %}
+    </div>
+{% endblock content %}

@@ -1,0 +1,457 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5;
+}
+
+.header {
+    background-color: #1877f2;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header h1 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.header nav ul li {
+    margin-left: 20px;
+}
+
+.header nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.header nav ul li a:hover {
+    text-decoration: underline;
+}
+
+.main-content {
+    padding: 20px;
+}
+
+.main-content h2 {
+    color: #333;
+}
+
+.main-content p {
+    color: #555;
+}
+
+.posts {
+    margin-top: 20px;
+}
+
+.post {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+.post h3 {
+    margin: 0 0 10px;
+    color: #1877f2;
+}
+
+.post p {
+    margin: 0;
+    color: #333;
+}
+
+.white-link {
+    color: white;
+    text-decoration: none;
+}
+
+.white-link:hover {
+    color: white;
+}
+
+
+.header {
+    display: flex; /* Використання Flexbox */
+    justify-content: space-between; /* Вирівнювання елементів з боків */
+    align-items: center; /* Вирівнювання елементів по вертикалі */
+    padding: 10px 20px;
+    background-color: #333; /* Фон шапки */
+    color: white; /* Білий текст */
+}
+
+.left-section {
+    display: flex; /* Розташування заголовка та форми в один рядок */
+    align-items: center; /* Вирівнювання елементів по вертикалі */
+    gap: 20px; /* Відступ між заголовком і формою */
+}
+
+.left-section h1 {
+    margin: 0;
+}
+
+.left-section form {
+    display: flex; /* Вирівнювання поля вводу та кнопки в рядок */
+    gap: 10px; /* Відступ між полем вводу та кнопкою */
+}
+
+.left-section input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.left-section button {
+    padding: 5px 10px;
+    border: none;
+    background-color: #555;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.left-section button:hover {
+    background-color: #777;
+}
+
+.right-section ul {
+    display: flex; /* Вирівнювання пунктів меню в рядок */
+    gap: 20px; /* Відступ між пунктами меню */
+    list-style: none; /* Видалення маркерів списку */
+    margin: 0;
+    padding: 0;
+}
+
+.right-section a {
+    color: white; /* Білий текст посилань */
+    text-decoration: none; /* Без підкреслення */
+}
+
+.right-section a:hover {
+    text-decoration: underline; /* Підкреслення при наведенні */
+}
+
+.center-section ul {
+    display: flex; /* Розташування пунктів меню в рядок */
+    gap: 20px; /* Відступ між пунктами */
+    list-style: none; /* Без маркерів списку */
+    margin: 0;
+    padding: 0;
+}
+
+.center-section a {
+    color: white; /* Білий текст посилань */
+    text-decoration: none; /* Без підкреслення */
+    font-size: 16px; /* Розмір тексту */
+}
+
+.center-section a:hover {
+    text-decoration: underline; /* Підкреслення при наведенні */
+} 
+
+/* юзер в пошуку  */
+.search-results {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
+
+.user-result {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s;
+}
+
+.user-result:hover {
+    background-color: #f0f0f0;
+}
+
+.profile-picture {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+}
+
+.user-info h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.user-info p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.view-profile {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.view-profile:hover {
+    text-decoration: underline;
+}
+.no-results {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+    margin-top: 20px;
+}
+
+
+/* profile page */ 
+/* Основні стилі */
+
+
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    padding: 0;
+}
+
+/* Шапка профілю */
+.profile-header {
+    position: relative;
+    text-align: center;
+}
+
+.cover-photo img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+.profile-info {
+    position: relative;
+    margin-top: -75px;
+}
+
+.profile-photo img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid #fff;
+}
+
+.profile-details h1 {
+    margin: 10px 0 5px;
+    font-size: 24px;
+}
+
+.profile-details p {
+    margin: 0;
+    color: #666;
+}
+
+.profile-stats {
+    margin-top: 10px;
+}
+
+.profile-stats span {
+    margin-right: 15px;
+    color: #606770;
+}
+
+/* Основна частина */
+.profile-main {
+    display: flex;
+    padding: 20px;
+}
+
+.profile-sidebar {
+    width: 250px;
+    margin-right: 20px;
+}
+
+.sidebar-section {
+    margin-bottom: 20px;
+}
+
+.sidebar-section h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+.sidebar-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-section ul li {
+    margin-bottom: 8px;
+    color: #606770;
+}
+
+.friends-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.friend {
+    text-align: center;
+}
+
+.friend img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.friend span {
+    display: block;
+    font-size: 12px;
+    color: #606770;
+}
+
+.profile-feed {
+    flex: 1;
+}
+
+.post {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 15px;
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.post-header img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.post-author strong {
+    font-size: 16px;
+}
+
+.post-author span {
+    font-size: 12px;
+    color: #606770;
+}
+
+.post-content img {
+    width: 100%;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.post-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
+.post-actions button {
+    background: none;
+    border: none;
+    color: #606770;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.post-actions button:hover {
+    color: #1877f2;
+}
+
+/* chat page */ 
+
+.chat-container {
+    width: 50%;
+    margin: 0 auto;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#chat-box {
+    width: 100%;
+    height: 400px;
+    border: 1px solid #ccc;
+    overflow-y: scroll;
+    padding: 10px;
+    background: #fff;
+    border-radius: 5px;
+}
+
+.message {
+    margin: 5px 0;
+    padding: 8px;
+    border-radius: 5px;
+    max-width: 80%;
+}
+
+.user-message {
+    background: #d1e7dd;
+    text-align: right;
+    margin-left: auto;
+}
+
+.other-message {
+    background: #f8d7da;
+    text-align: left;
+    margin-right: auto;
+}
+
+.chat-input {
+    display: flex;
+    margin-top: 10px;
+}
+
+#message-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#send-btn {
+    padding: 8px 15px;
+    border: none;
+    background: #28a745;
+    color: white;
+    cursor: pointer;
+    margin-left: 5px;
+    border-radius: 5px;
+}
+
+#send-btn:hover {
+    background: #218838;
+}

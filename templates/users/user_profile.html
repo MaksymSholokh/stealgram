@@ -5,14 +5,17 @@
 <div class="profile-container">
     <div class="cover-photo"></div>
     <div class="profile-header">
-        <img src="avatar.jpg" alt="Аватар користувача" class="profile-avatar">
+        <img src="{{ profile.photo }}" alt="Аватар користувача" class="profile-avatar">
         <h1 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h1>
     </div>
-    <div class="profile-navigation">
-        <button>#</button>
-        <button>#</button>
-        <button>#</button>
-        <button>#</button>
+    <div class="profile-navigation"> 
+        <a href="{% url "users:all_friends" %}">
+            <button>Friends</button>
+        </a>
+        <a href="#">
+            <button>Posts</button>
+        </a>
+        
        
     </div>
     <div class="profile-info">
@@ -20,19 +23,8 @@
         
         <p><strong>About:</strong>{{ profile.about }}</p>
     </div>
-    <div class="posts-section">
-        <div class="new-post">
-            <textarea placeholder="What`s new?"></textarea>
-            <button>Publish</button>
-        </div>
-        <div class="post">
-            <img src="avatar.jpg" alt="Аватар" class="post-avatar">
-            <div class="post-content">
-                <h4>Ім'я Користувача</h4>
-                <p>Це мій перший пост!</p>
-            </div>
-        </div>
-    </div>
+
+    {% include "post/create_post.html" %}
 </div>
 
 

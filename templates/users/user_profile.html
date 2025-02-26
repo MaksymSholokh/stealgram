@@ -12,7 +12,7 @@
         <a href="{% url "users:all_friends" %}">
             <button>Friends</button>
         </a>
-        <a href="#">
+        <a href="{% url "post:list_posts" request.user.username %}">
             <button>Posts</button>
         </a>
         
@@ -24,9 +24,55 @@
         <p><strong>About:</strong>{{ profile.about }}</p>
     </div>
 
-    {% include "post/create_post.html" %}
+    <!-- Кнопка для відкриття модального вікна -->
+<button id="openModalBtn">Додати пост</button>
+
+<!-- Модальне вікно -->
+<div id="postModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Створити пост</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %} 
+            <label for="id_text">Текст:</label>
+            <textarea name="text" cols="40" rows="5" maxlength="10000" required="" id="id_text"></textarea>
+
+            <label for="id_photo">Фото:</label>
+            <input type="file" name="photo" accept="image/*" id="id_photo">
+
+            <label for="id_video">Відео:</label>
+            <input type="file" name="video" id="id_video">
+
+            <button type="submit">Опублікувати</button>
+        </form>
+    </div>
 </div>
 
 
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var modal = document.getElementById("postModal");
+        var openBtn = document.getElementById("openModalBtn");
+        var closeBtn = document.querySelector(".close");
+    
+        // Відкрити модальне вікно
+        openBtn.onclick = function() {
+            modal.style.display = "flex";
+        }
+    
+        // Закрити при натисканні на "×"
+        closeBtn.onclick = function() {
+            modal.style.display = "none";
+        }
+    
+        // Закрити при натисканні за межами форми
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    });
+    </script>
 
 {% endblock content %}

@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Q
-
+from post.forms import PostForm
 
 
 # Create your views here.
@@ -114,8 +114,18 @@ def friends(request):
 def profile_user(request, username):  
     user = get_object_or_404(User, username=username) 
     profile = get_object_or_404(Profile, user=user) 
-    friends  = list_friends(request.user)[:3]
-    
-    context = {'profile': profile, 'user': user, 'friends': friends}
+    friends  = list_friends(request.user)[:3] 
 
+    if request.method == 'POST':
+        # scope 1 - form
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid(): 
+            post = form.save(commit=False) 
+            post.user = request.user 
+            post.save() 
+
+            return redirect(request.META.get('HTTP_REFERER', '/')) 
+    form = PostForm()
+
+    context = {'profile': profile, 'user': user, 'friends': friends, 'form': form}
     return render(request, 'users/user_profile.html', context=context)

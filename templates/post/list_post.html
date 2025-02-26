@@ -1,7 +1,9 @@
 {% extends "base.html" %} 
 
 {% block content %}
-
+    {% for post in list_posts  %}
+        {{post}}
+    {% endfor %}
 
 {% endblock content %}
 

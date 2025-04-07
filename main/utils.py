@@ -6,9 +6,13 @@ from django.db.models import Q
 
 def user_search(query):
     #return User.objects.annotate(search=SearchVector("first_name", "last_name"),).filter(search=query) 
-    vector = SearchVector("first_name", 'last_name', 'username')
-    query = SearchQuery(query)
-    return User.objects.annotate(rank=SearchRank(vector, query)).filter(rank__gt=0).order_by("-rank") 
+    # vector = SearchVector("first_name", 'last_name', 'username')
+    # query = SearchQuery(query) 
+    print(query)
+    res = User.objects.filter(first_name__icontains=query)  
+    
+    return res
+    # return User.objects.annotate(rank=SearchRank(vector, query)).filter(rank__gt=0).order_by("-rank") 
 
 
 def list_friends(user): 

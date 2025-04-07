@@ -7,7 +7,7 @@ from users.models import user_dir_path
 
 class Published(models.Manager): 
     def get_queryset(self):
-        return super().get_queryset().filter(status="Pb")
+        return super().get_queryset().filter(status="Dr")
     
 
 
@@ -18,7 +18,7 @@ class Post(models.Model):
     ]
 
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user') 
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post_owner', default=1) 
     create_time= models.DateTimeField(auto_now_add=True) 
     rewrite_time = models.DateTimeField(auto_now=True) 
     text = models.TextField(max_length=10000) 
@@ -27,11 +27,15 @@ class Post(models.Model):
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default='Dr')
 
     objects = models.Manager() 
-    published = Published() 
+    published = Published()  
+
+    def save_pb(self):  
+        self.status = 'Pb'
+        return self.save()     
 
 
 class Comment(models.Model): 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner') 
     created = models.DateTimeField(auto_now_add=True) 
     text = models.TextField(max_length=100) 
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='owner') 
+    post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name='post') 

@@ -29,7 +29,7 @@
             <ul>
               {% if user.is_authenticated %}
                 <li><a href="{% url "users:profile" request.user %}">My profile</a></li>
-                <li><a href="#">Messages</a></li>
+                <li><a href="{% url "chat:all_chats" %}">Messages</a></li>
                 <li><a href="{% url 'users:logout' %}">Logout</a></li> 
                 {% else %} 
                 <li><a href="{% url 'users:login' %}">login</a></li>

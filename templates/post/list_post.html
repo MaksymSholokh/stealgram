@@ -1,9 +1,49 @@
 {% extends "base.html" %} 
 
+{% comment %} 
 {% block content %}
     {% for post in list_posts  %}
-        {{post}}
+        {{post.owner}} 
+        {{ post.create_time }} 
+        {% if post.rewrite_time %}{{ post.rewrite_time }}{% endif %}
+            {{ post.rewrite_time }}  
+        {{ post.text }}
+        {{ post.photo }}
+        {{ post.video }}
+
     {% endfor %}
 
-{% endblock content %}
+{% endblock content %} {% endcomment %}
 
+
+
+
+{% block content %}
+    <div class="post-list">
+        {% for post in list_posts %}
+            <div class="post">
+                <div class="post-header">
+                    <span class="post-owner">{{ post.owner }}</span>
+                    <span class="post-time">{{ post.create_time }}</span>
+                </div>
+                {% if post.rewrite_time %}
+                    <span class="post-time">{{ post.rewrite_time }}</span>
+                {% endif %}
+                <div class="post-content">
+                    {{ post.text|truncatechars:75 }}
+                </div>
+                <div class="post-media">
+                    {% if post.photo %}
+                        <img src="{{ post.photo.url }}" alt="Post image">
+                    {% endif %}
+                    {% if post.video %}
+                        <video controls>
+                            <source src="{{ post.video.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock content %}

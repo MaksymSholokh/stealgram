@@ -3,7 +3,7 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 
-from .models import Message, MessageReadStatus, ChatTwoUser
+from .models import Message, ChatTwoUser
 from django.utils import timezone
 
 class ChatConsumer(WebsocketConsumer):

@@ -35,7 +35,7 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %} 
             <label for="id_text">Текст:</label>
-            <textarea name="text" cols="40" rows="5" maxlength="10000" required="" id="id_text"></textarea>
+            <textarea name="text" cols="40" rows="5" maxlength="10000" required="" id="id_text", onkeyup="save_draft(event)">{{ draft_post }}</textarea>
 
             <label for="id_photo">Фото:</label>
             <input type="file" name="photo" accept="image/*" id="id_photo">
@@ -50,7 +50,7 @@
 
 
 
-<script>
+<script> 
     document.addEventListener("DOMContentLoaded", function() {
         var modal = document.getElementById("postModal");
         var openBtn = document.getElementById("openModalBtn");
@@ -73,6 +73,43 @@
             }
         }
     });
+    
+    const username = '{{ request.user.username }}/'; 
+    const url  = `/users/profile/${username}`; 
+
+    console.log(url)
+
+    function save_draft(event) {
+        let key = event.key  
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', 
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({'text': key})
+            
+        })
+        .then(response => response.json())
+        .then(data => console.log(key))
+        .catch(error =>  console.log(error))
+    };
     </script>
 
 {% endblock content %}

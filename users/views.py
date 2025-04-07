@@ -13,8 +13,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Q
 from post.forms import PostForm
-
-
+import json
+from post.models import Post
 # Create your views here.
 
 
@@ -116,16 +116,20 @@ def profile_user(request, username):
     profile = get_object_or_404(Profile, user=user) 
     friends  = list_friends(request.user)[:3] 
 
-    if request.method == 'POST':
-        # scope 1 - form
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid(): 
-            post = form.save(commit=False) 
-            post.user = request.user 
-            post.save() 
+    draft_post, created = Post.published.get_or_create(owner=request.user) 
 
-            return redirect(request.META.get('HTTP_REFERER', '/')) 
-    form = PostForm()
+    if request.method == 'POST':  
+        if request.content_type == 'application/json': 
 
-    context = {'profile': profile, 'user': user, 'friends': friends, 'form': form}
+            new_s = json.loads(request.body)   
+            draft_post.text += new_s['text']
+            draft_post.save()  
+        else: 
+            form = PostForm(request.POST, request.FILES)
+            if form.is_valid():  
+                draft_post.save_pb()
+                return redirect(request.META.get('HTTP_REFERER', '/')) 
+
+    form = PostForm() 
+    context = {'profile': profile, 'user': user, 'friends': friends, 'form': form, 'draft_post': draft_post.text}
     return render(request, 'users/user_profile.html', context=context)

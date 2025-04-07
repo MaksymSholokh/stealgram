@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render
-from .models import ChatTwoUser, Message, MessageReadStatus
-from django.db.models import Q
+from .models import ChatTwoUser, Message
+from django.db.models import Q, Max
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -50,3 +50,15 @@ def chat_two_user(request, chat_id):
         'page_obj': page_obj, 
         'count_page': count_page,}
     return render(request, 'chat/chat_page.html', context=context)
+
+@login_required(login_url='users:login')
+def chats(request): 
+
+    chats = ChatTwoUser.objects.filter(
+        Q(first_user=request.user)|Q(second_user=request.user)
+        )
+    another_user =  chats.objects.filter()
+    chats = chats.annotate(last_message=Max('message__created')).order_by('-last_message')
+
+    context = {'chats': chats} 
+    return render(request, 'chat/all_chats.html', context)

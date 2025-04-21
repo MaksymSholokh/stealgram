@@ -1,292 +1,97 @@
 {% extends "base.html" %} 
+{% block content %}  
 
 
- {% comment %} first version {% endcomment %}
 
-{% comment %} 
-{% block content %}
+<div id="chat-container">
+    {% if chat.first_user.id == chat.second_user.id %} 
+    <div id="chat-header">Saved message</div>  
 
-    <div class="chat-container">
-        <h2>Chat with: <span id="room-name"></span></h2>
-        <div id="chat-box"></div>
-        <div class="chat-input">
-            <input id="message-input" type="text" placeholder="Your message..." autocomplete="off">
-            <button id="send-btn">Send message</button>
+    {% else %} 
+    <div id="chat-header">Chat with {% if chat.first_user.id == request.user.id %} {{chat.second_user}} {% else %} {{chat.first_user}} {% endif %}</div>  
+    {% endif %}
+    <div id="chat-log">
+            {% for message in histori_chat %}
+               {% if message.sender.id == request.user.id %} 
+               <div class="message user-message"><p>{{message.text_message}} {{ message.created }}</p></div>
+                {% else  %}
+                <div class="message other-message"><p>{{ message.text_message }}  {{ message.created }}</p></div>
+                {% endif %}
+            {% endfor %} 
+
+            
+            
         </div>
-    </div> 
+        <div id="chat-input-container">
+            <textarea id="chat-message" placeholder="Type message..."></textarea>
+            <button id="send-button">Send</button>
+        </div>
+    </div>
 
-    <script>
-        const roomName = "{{ chat_id }}";
-        document.getElementById("room-name").textContent = roomName;
+     {% comment %} <textarea id="chat-log" cols="100" rows="20"></textarea><br> 
+ 
+
+    <input id="chat-message-input" type="text" size="100"><br>
+    <input id="chat-message-submit" type="button" value="Send">  
+     {% endcomment %}
+    {{ chat_id|json_script:"chat_id" }}
+    {{ request.user.id|json_script:"cur_user" }}
+
+<script>
+
+        const chat_id = JSON.parse(document.getElementById('chat_id').textContent);
 
         const chatSocket = new WebSocket(
-            "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
+            'ws://'
+            + window.location.host
+            + '/chat/'
+            + chat_id
+            + '/'
         );
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            const chatBox = document.querySelector("#chat-box");
-            const messageElement = document.createElement("div");
-            messageElement.classList.add("message");
+            const owner = JSON.parse(document.getElementById('cur_user').textContent); 
+            const divMessage = document.getElementById('chat-log');
 
-            if (data.username === "{{ request.user.username }}") {
-                messageElement.classList.add("user-message");
-            } else {
-                messageElement.classList.add("other-message");
+            if (data.owner ===  owner) {
+
+                divMessage.innerHTML += `<div class="message user-message">${data.message} ${data.time}</div>`;
+            }  else  {
+                divMessage.innerHTML += `<div class="message  other-message">${data.message} ${data.time}</div>`;
             }
-
-            messageElement.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
-            chatBox.appendChild(messageElement);
-            chatBox.scrollTop = chatBox.scrollHeight;
         };
 
-        document.querySelector("#send-btn").onclick = function() {
-            const messageInput = document.querySelector("#message-input");
-            const message = messageInput.value;
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.getElementById('chat-message').onkeyup = function(e) { 
+            if (e.key === 'Enter') {  // enter, return 
+                document.getElementById('send-button').click();
+            }
+        };
+
+
+        document.getElementById('send-button').onclick = function(e) {
+            const messageInputDom = document.getElementById('chat-message');
+            const message = messageInputDom.value;  
+            const owner = JSON.parse(document.getElementById('cur_user').textContent);
+
             chatSocket.send(JSON.stringify({
-                "username": "{{ request.user.username }}",
-                "message": message
+                'message': message, 
+                //'owner': owner,
             }));
-            messageInput.value = "";
+            messageInputDom.value = '';
         };
+ 
     </script>
 
 
 
 
-   
-{% endblock content %} {% endcomment %} 
-
- {% comment %} beter version 2 {% endcomment %}
-{% comment %} {% block content %}
-<div class="chat-container">
-    <h2>Chat with: <span id="room-name"></span></h2>
-
-    <!-- Блок для повідомлень -->
-    <div id="chat-box" class="chat-box">
-        <div id="loading" class="loading" style="display: none;">Loading...</div>
-        {% for message in page_obj %}
-            <div class="message {% if message.owner == request.user %}user-message{% else %}other-message{% endif %}">
-                <strong>{{ message.owner.username }}:</strong> {{ message.text_message }}
-            </div>
-        {% endfor %}
-    </div>
-
-    <!-- Поле вводу повідомлення -->
-    <div class="chat-input">
-        <input id="message-input" type="text" placeholder="Your message..." autocomplete="off">
-        <button id="send-btn">Send</button>
-    </div>
-</div>
-<script>
-    const roomName = "{{ chat_id }}";
-    document.getElementById("room-name").textContent = roomName;
-
-    const chatBox = document.querySelector("#chat-box");
-    const loading = document.querySelector("#loading");
-    let page = 2;  // Починаємо з другої сторінки (перша вже завантажена)
-    let hasMoreMessages = true;
-    let isLoading = false;
-
-    // Функція для завантаження старих повідомлень
-    function loadMoreMessages() {
-        if (!hasMoreMessages || isLoading) return;
-        isLoading = true;
-        loading.style.display = "block";
-
-        const scrollHeightBefore = chatBox.scrollHeight;
-
-        fetch(`?page=${page}`)
-            .then(response => response.text())
-            .then(html => {
-                const tempDiv = document.createElement("div");
-                tempDiv.innerHTML = html;
-
-                const newMessages = tempDiv.querySelectorAll(".message");
-                if (newMessages.length === 0) {
-                    hasMoreMessages = false;
-                } else {
-                    const firstMessage = chatBox.firstChild;
-                    newMessages.forEach(msg => chatBox.insertBefore(msg, firstMessage));
-                    page++;
-                }
-
-                // Відновлення позиції прокрутки
-                chatBox.scrollTop = chatBox.scrollHeight - scrollHeightBefore;
-            })
-            .finally(() => {
-                isLoading = false;
-                loading.style.display = "none";
-            });
-    }
-
-    // Виклик функції при прокручуванні вгору
-    chatBox.addEventListener("scroll", function() {
-        if (chatBox.scrollTop === 0) {
-            loadMoreMessages();
-        }
-    });
-
-    // WebSocket підключення
-    const chatSocket = new WebSocket(
-        "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
-    );
-
-    // Обробка отриманих повідомлень
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        const messageElement = document.createElement("div");
-        messageElement.classList.add("message");
-
-        if (data.username === "{{ request.user.username }}") {
-            messageElement.classList.add("user-message");
-        } else {
-            messageElement.classList.add("other-message");
-        }
-
-        messageElement.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
-        chatBox.appendChild(messageElement);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    };
-
-    // Відправка повідомлення
-    document.querySelector("#send-btn").onclick = function() {
-        const messageInput = document.querySelector("#message-input");
-        const message = messageInput.value;
-        if (message.trim() !== "") {
-            chatSocket.send(JSON.stringify({
-                "username": "{{ request.user.username }}",
-                "message": message
-            }));
-            messageInput.value = "";
-        }
-    };
-
-    // Автоматична прокрутка до останнього повідомлення при завантаженні сторінки
-    chatBox.scrollTop = chatBox.scrollHeight;
-</script>
-{% endblock content %} {% endcomment %}
 
 
 
 
- {% comment %} 
-  almost work 
-  uncorrect broke pagination 
-  time message 
-  {% endcomment %}
-{% block content %} 
-{% comment %} count of exist page in :   
- 
-count_page {% endcomment %}
-
-<div class="chat-container">
-    <h2>Chat with: <span id="room-name"></span></h2>
-
-    <!-- Блок для повідомлень -->
-    <div id="chat-box" class="chat-box">
-        <div id="loading" class="loading" style="display: none;">Loading...</div>
-        {% for message in page_obj reversed %}
-            <div class="message {% if message.owner == request.user %}user-message{% else %}other-message{% endif %}">
-                <strong>{{ message.owner.username }}:</strong> {{ message.text_message }}
-            </div>
-        {% endfor %}
-    </div>
-
-    <!-- Поле вводу повідомлення -->
-    <div class="chat-input">
-        <input id="message-input" type="text" placeholder="Your message..." autocomplete="off">
-        <button id="send-btn">Send</button>
-    </div>
-</div>
-
-<script>
-    const roomName = "{{ chat_id }}";
-    document.getElementById("room-name").textContent = roomName;
-
-    const chatBox = document.querySelector("#chat-box");
-    const loading = document.querySelector("#loading");
-
-    let page = 2;  // Починаємо з другої сторінки (перша вже завантажена)
-    let hasMoreMessages = true;
-    let isLoading = false;
-
-    // Функція для завантаження старих повідомлень
-    function loadMoreMessages() {
-        if (!hasMoreMessages || isLoading) return;
-        isLoading = true;
-        loading.style.display = "block";
-
-        const scrollHeightBefore = chatBox.scrollHeight;
-
-        fetch(`?page=${page}`)
-            .then(response => response.text())
-            .then(html => {
-                const tempDiv = document.createElement("div");
-                tempDiv.innerHTML = html;
-
-                const newMessages = tempDiv.querySelectorAll(".message");
-                if (newMessages.length === 0) {
-                    hasMoreMessages = false;
-                } else {
-                    newMessages.forEach(msg => chatBox.insertBefore(msg, chatBox.firstChild));
-                    page++;
-                }
-
-                // Відновлення позиції прокрутки
-                chatBox.scrollTop = chatBox.scrollHeight - scrollHeightBefore;
-            })
-            .finally(() => {
-                isLoading = false;
-                loading.style.display = "none";
-            });
-    }
-
-    // Виклик функції при прокручуванні вгору
-    chatBox.addEventListener("scroll", function() {
-        if (chatBox.scrollTop === 0) {
-            loadMoreMessages();
-        }
-    });
-
-    // WebSocket підключення
-    const chatSocket = new WebSocket(
-        "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
-    );
-
-    // Обробка отриманих повідомлень
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        const messageElement = document.createElement("div");
-        messageElement.classList.add("message");
-
-        if (data.username === "{{ request.user.username }}") {
-            messageElement.classList.add("user-message");
-        } else {
-            messageElement.classList.add("other-message");
-        }
-
-        messageElement.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
-        chatBox.appendChild(messageElement);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    };
-
-    // Відправка повідомлення
-    document.querySelector("#send-btn").onclick = function() {
-        const messageInput = document.querySelector("#message-input");
-        const message = messageInput.value;
-        if (message.trim() !== "") {
-            chatSocket.send(JSON.stringify({
-                "username": "{{ request.user.username }}",
-                "message": message
-            }));
-            messageInput.value = "";
-        }
-    };
-
-    // Автоматична прокрутка до останнього повідомлення при завантаженні сторінки
-    chatBox.scrollTop = chatBox.scrollHeight;
-</script>
-
-{% endblock content %} 
-
+{% endblock content %}

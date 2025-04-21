@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render
 from .models import ChatTwoUser, Message
-from django.db.models import Q, Max
+from django.db.models import Q, Max, Count
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -28,28 +28,17 @@ def chat_two_user(request, chat_id):
     chat = ChatTwoUser.objects.get(id=chat_id) 
 
     try:
-        histori_chat = Message.objects.filter(chat=chat).order_by('-created')
-
+        histori_chat = Message.objects.filter(chat=chat).order_by('created') 
     except: 
         histori_chat = None  
-    page_obj = None 
-
-    page_number = request.GET.get("page", 1)
-
-    if histori_chat.exists():
-        paginator = Paginator(histori_chat, 15)  
-
-        page_obj = paginator.get_page(page_number) 
-
-        count_page = paginator.num_pages
-
-
+        
     context = {
-        'chat_id': chat_id, 
+        'chat_id': chat_id,
+        'chat': chat,
         'histori_chat': histori_chat, 
-        'page_obj': page_obj, 
-        'count_page': count_page,}
+        }
     return render(request, 'chat/chat_page.html', context=context)
+
 
 @login_required(login_url='users:login')
 def chats(request): 
@@ -57,8 +46,31 @@ def chats(request):
     chats = ChatTwoUser.objects.filter(
         Q(first_user=request.user)|Q(second_user=request.user)
         )
-    another_user =  chats.objects.filter()
-    chats = chats.annotate(last_message=Max('message__created')).order_by('-last_message')
+    unread_chats = chats.filter(messages__is_read=False, messages__receiver=request.user).distinct().order_by('-created') 
+    other_chats = chats.exclude(id__in=unread_chats.values('id')).distinct().order_by('-created')  
 
-    context = {'chats': chats} 
+    chats_and_user = []
+    for chats in unread_chats: 
+        other_user = chats.other_user(request.user) 
+        count_unread_message = chats.messages.filter(is_read=False).count()
+        last_message_in_chat = chats.messages.latest('created')
+        chats_and_user.append({
+            'chats': chats,
+            'other_user': other_user, 
+            'last_message_in_chat': last_message_in_chat.text_message, 
+            'count_unread_message': count_unread_message})
+
+  
+    another_chats_and_users = [] 
+
+    for chat in other_chats: 
+        last_message_in_chat = chat.messages.latest('created') 
+        last_user = last_message_in_chat.sender 
+        another_chats_and_users.append({
+            'chat':  chat, 
+            'last_message_in_chat': last_message_in_chat.text_message, 
+            'last_user': last_user})
+
+
+    context = {'another_chats_and_users': another_chats_and_users, 'chats_and_user': chats_and_user} 
     return render(request, 'chat/all_chats.html', context)

@@ -8,7 +8,7 @@ def user_dir_path(instance, filename):
     return f"{instance.user.username}/{timezone.now().strftime('%Y/%m/%d')}/{filename}"
 
 class Profile(models.Model):  
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     phone_number = models.CharField(max_length=12) 
     friends = models.ManyToManyField(to='self', symmetrical=True, blank=True, through='Friend') 
 

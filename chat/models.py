@@ -8,12 +8,18 @@ from django.utils import timezone
 class ChatTwoUser(models.Model): 
     first_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='first_user')
     second_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='second_user') 
-    creted = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)  
+
+
+    def other_user(self, owner):  
+        other_user = self.second_user if self.first_user == owner else self.first_user
+        return other_user
 
 
 class Message(models.Model): 
-    chat = models.ForeignKey(ChatTwoUser, on_delete=models.CASCADE)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    chat = models.ForeignKey(ChatTwoUser, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender_user', null=True) 
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver_user', null=True)
     text_message = models.TextField(max_length=1000)
     created = models.DateTimeField(auto_now_add=True) 
-    is_read = models.BooleanField(default=False)
+    is_read = models.BooleanField(default=False) 

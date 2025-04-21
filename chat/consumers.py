@@ -1,16 +1,16 @@
 import json
 
-from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
-
+from channels.generic.websocket import WebsocketConsumer
+from django.contrib.auth import get_user_model
 from .models import Message, ChatTwoUser
-from django.utils import timezone
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
-        self.user = self.scope["user"]
         self.room_name = self.scope["url_route"]["kwargs"]["chat_id"]
-        self.room_group_name = f"chat_{self.room_name}"
+        self.room_group_name = f"chat_{self.room_name}"  
+
+
 
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
@@ -28,39 +28,34 @@ class ChatConsumer(WebsocketConsumer):
     # Receive message from WebSocket
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json["message"]  
+        message = text_data_json["message"] 
 
-        chat = ChatTwoUser.objects.get(id=int(self.room_name))
-
-        # save message to postgres 
-        Message.objects.create(
+        user = get_user_model().objects.get(username = self.scope['user'])  
+        chat = ChatTwoUser.objects.get(id=int(self.room_name)) 
+        receiver_user = chat.second_user if chat.first_user == user else  user
+        create_message = Message.objects.create(
             chat=chat, 
-            owner = self.user, 
-            text_message = message,  
-            
+            sender=user,  
+            receiver = receiver_user,
+            text_message=message
+            )
+        # create_message = Message.objects.get(owner=user, chat=chat)
 
-        )
-        now = timezone.now()
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name, {
-                "type": "chat.message", 
-                "message": message, 
-                'username': self.user.username,
-                'datetime': now.isoformat(),
-                })
+            self.room_group_name, {"type": "chat.message", "message": message, 'owner': user.id, 'time': create_message.created.isoformat()}
+        )
 
     # Receive message from room group
     def chat_message(self, event):
-        message = event["message"]
-        username = event["username"] 
-        
+        message = event["message"]   
+        owner = event['owner'] 
+        time = event['time']  
+        chat = int(self.scope["url_route"]["kwargs"]["chat_id"])
+
+
+        Message.objects.filter(chat=chat, is_read=False, receiver=owner).update(is_read=True)
+
 
         # Send message to WebSocket
-        self.send(text_data=json.dumps(
-            {
-                "message": message, 
-                'username': username,
-                })) 
-
-
+        self.send(text_data=json.dumps({"message": message, 'owner': owner, 'time': time}))

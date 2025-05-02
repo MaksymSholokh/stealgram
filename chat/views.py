@@ -4,6 +4,7 @@ from django.db.models import Q, Max, Count
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+import base64 
 
 # Create your views here.
 
@@ -24,13 +25,15 @@ def create_chat_two_user(request, user_id):
 
 
 @login_required(login_url='users:login')
-def chat_two_user(request, chat_id): 
+def chat_two_user(request, chat_id):  
+
     chat = ChatTwoUser.objects.get(id=chat_id) 
 
     try:
-        histori_chat = Message.objects.filter(chat=chat).order_by('created') 
+        histori_chat = Message.objects.filter(chat=chat).order_by('created')
     except: 
-        histori_chat = None  
+        histori_chat = None   
+    
         
     context = {
         'chat_id': chat_id,
@@ -61,11 +64,16 @@ def chats(request):
             'count_unread_message': count_unread_message})
 
   
+ 
     another_chats_and_users = [] 
-
-    for chat in other_chats: 
-        last_message_in_chat = chat.messages.latest('created') 
-        last_user = last_message_in_chat.sender 
+    
+    for chat in other_chats:  
+        try:
+            last_message_in_chat = chat.messages.latest('created')  
+            last_user = last_message_in_chat.sender 
+        except: 
+            last_message_in_chat = 'No message yet' 
+            last_user = chat.other_user
         another_chats_and_users.append({
             'chat':  chat, 
             'last_message_in_chat': last_message_in_chat.text_message, 

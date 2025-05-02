@@ -19,6 +19,10 @@ class Post(models.Model):
 
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post_owner', default=1) 
+
+    like = models.ManyToManyField(to=User, related_name='post_like', blank=True)
+
+
     create_time= models.DateTimeField(auto_now_add=True) 
     rewrite_time = models.DateTimeField(auto_now=True) 
     text = models.TextField(max_length=10000) 
@@ -36,6 +40,9 @@ class Post(models.Model):
 
 class Comment(models.Model): 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner') 
+
+    like = models.ManyToManyField(to=User, related_name='comment_like', blank=True)
+
     created = models.DateTimeField(auto_now_add=True) 
     text = models.TextField(max_length=100) 
-    post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name='post') 
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post') 

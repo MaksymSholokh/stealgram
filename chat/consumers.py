@@ -1,4 +1,6 @@
 import json
+from PIL import Image
+import base64 
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
@@ -28,29 +30,41 @@ class ChatConsumer(WebsocketConsumer):
     # Receive message from WebSocket
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json["message"] 
+        message = text_data_json["message"]   
+        content = text_data_json["content"]  
+
+        show_content = f"data:image/jpeg;base64,{content}"
+        #show_content = f"data:image/jpeg;base64,{base64.b64encode(content).decode('utf-8')}" 
+
+
+        
+
+
 
         user = get_user_model().objects.get(username = self.scope['user'])  
         chat = ChatTwoUser.objects.get(id=int(self.room_name)) 
         receiver_user = chat.second_user if chat.first_user == user else  user
+
         create_message = Message.objects.create(
             chat=chat, 
             sender=user,  
             receiver = receiver_user,
-            text_message=message
+            text_message=message, 
+            photo=show_content
             )
         # create_message = Message.objects.get(owner=user, chat=chat)
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name, {"type": "chat.message", "message": message, 'owner': user.id, 'time': create_message.created.isoformat()}
+            self.room_group_name, {"type": "chat.message", "message": message, 'owner': user.id, 'time': create_message.created.isoformat(), 'content': show_content}
         )
 
     # Receive message from room group
     def chat_message(self, event):
-        message = event["message"]   
+        message = event["message"]
         owner = event['owner'] 
         time = event['time']  
+        content = event['content']
         chat = int(self.scope["url_route"]["kwargs"]["chat_id"])
 
 
@@ -58,4 +72,4 @@ class ChatConsumer(WebsocketConsumer):
 
 
         # Send message to WebSocket
-        self.send(text_data=json.dumps({"message": message, 'owner': owner, 'time': time}))
+        self.send(text_data=json.dumps({"message": message, 'owner': owner, 'time': time, 'content': content}))

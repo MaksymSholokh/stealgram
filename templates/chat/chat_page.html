@@ -1,4 +1,4 @@
-{% extends "base.html" %} 
+{% comment %} {% extends "base.html" %}  {% endcomment %}
 {% block content %}  
 
 
@@ -13,7 +13,7 @@
     <div id="chat-log">
             {% for message in histori_chat %}
                {% if message.sender.id == request.user.id %} 
-               <div class="message user-message"><p>{{message.text_message}} {{ message.created }}</p></div>
+               <div class="message user-message"><img src="{{ message.photo }}" width="150" height="200"> <p>{{message.text_message}} {{ message.created }}</p></div>
                 {% else  %}
                 <div class="message other-message"><p>{{ message.text_message }}  {{ message.created }}</p></div>
                 {% endif %}
@@ -22,8 +22,9 @@
             
             
         </div>
-        <div id="chat-input-container">
-            <textarea id="chat-message" placeholder="Type message..."></textarea>
+        <div id="chat-input-container"> 
+            <textarea id="chat-message" placeholder="Type message..."></textarea> 
+            <input id="files"  type='file'></input>
             <button id="send-button">Send</button>
         </div>
     </div>
@@ -53,12 +54,11 @@
             const data = JSON.parse(e.data);
             const owner = JSON.parse(document.getElementById('cur_user').textContent); 
             const divMessage = document.getElementById('chat-log');
-
+            // fix it
             if (data.owner ===  owner) {
-
-                divMessage.innerHTML += `<div class="message user-message">${data.message} ${data.time}</div>`;
-            }  else  {
-                divMessage.innerHTML += `<div class="message  other-message">${data.message} ${data.time}</div>`;
+                divMessage.innerHTML += `<div class="message user-message"><img src='${data.content}' width="150" height="200"> </img>${data.message} ${data.time}</div>`;
+            }  else  { 
+                divMessage.innerHTML += `<div class="message  other-message">${data.message}  ${data.time}</div>`;
             }
         };
 
@@ -73,16 +73,31 @@
         };
 
 
+
         document.getElementById('send-button').onclick = function(e) {
             const messageInputDom = document.getElementById('chat-message');
             const message = messageInputDom.value;  
-            const owner = JSON.parse(document.getElementById('cur_user').textContent);
+            const owner = JSON.parse(document.getElementById('cur_user').textContent);   
 
-            chatSocket.send(JSON.stringify({
-                'message': message, 
-                //'owner': owner,
-            }));
-            messageInputDom.value = '';
+            const messageFiles = document.getElementById('files'); 
+            const files = messageFiles.files[0];  
+
+            const reader = new FileReader(); 
+
+            reader.onloadend = function() {
+                const data = reader.result.split(',')[1];
+                chatSocket.send(JSON.stringify({
+                    'message':  message, 
+                    'content': String(data),
+                }));
+                messageInputDom.value = '';
+            };
+            reader.readAsDataURL(files);
+
+
+               
+
+            
         };
  
     </script>

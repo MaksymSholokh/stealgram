@@ -1,11 +1,15 @@
 import json
-from PIL import Image
+import uuid
+from django.core.files.base import ContentFile
+
 import base64 
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from django.contrib.auth import get_user_model
 from .models import Message, ChatTwoUser
+
+
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
@@ -31,14 +35,13 @@ class ChatConsumer(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]   
-        content = text_data_json["content"]  
+        content = text_data_json["content"] 
 
-        show_content = f"data:image/jpeg;base64,{content}"
-        #show_content = f"data:image/jpeg;base64,{base64.b64encode(content).decode('utf-8')}" 
-
-
-        
-
+        show_content = None
+        image = None
+        if content != 'None':  
+            show_content = f"data:image/jpeg;base64,{content}" 
+            image = ContentFile(base64.b64decode(content), name=f"{uuid.uuid4()}.png")
 
 
         user = get_user_model().objects.get(username = self.scope['user'])  
@@ -50,7 +53,7 @@ class ChatConsumer(WebsocketConsumer):
             sender=user,  
             receiver = receiver_user,
             text_message=message, 
-            photo=show_content
+            photo=image
             )
         # create_message = Message.objects.get(owner=user, chat=chat)
 

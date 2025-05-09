@@ -658,4 +658,56 @@ body {
 
 #send-button:hover {
     background-color: #0056b3;
-}
+} 
+
+
+/* post button like dislike comment share */
+
+.like-comment-share {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  .like, .dislike {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .like button, .dislike button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    transition: transform 0.2s ease;
+  }
+  
+  .like button:hover img,
+  .dislike button:hover img {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  
+  .like img, .dislike img {
+    width: 32px;
+    height: 32px;
+    stroke: gray;
+    fill: none;
+    transition: stroke 0.3s, fill 0.3s;
+  }
+  /* 
+  
+  after click
+
+  stroke: red;
+  fill: red; */
+
+
+  /* Стиль для лічильників */
+  .like p, .dislike p {
+    margin-top: 5px;
+    font-size: 14px;
+    color: #555;
+  }

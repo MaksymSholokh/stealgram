@@ -21,6 +21,8 @@ class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender_user', null=True) 
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver_user', null=True)
     text_message = models.TextField(max_length=1000, blank=True, null=True) 
-    photo = models.TextField(blank=True, null=True)
+
+    photo = models.ImageField(upload_to='chat_photos/' , blank=True, null=True)
+
     created = models.DateTimeField(auto_now_add=True) 
     is_read = models.BooleanField(default=False) 

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 import base64 
-
+from .forms import PhotoChat
 # Create your views here.
 
 
@@ -35,11 +35,27 @@ def chat_two_user(request, chat_id):
         histori_chat = None   
     
         
+    
+    
+    # if request.method == 'POST':   
+    #     form = PhotoChat(data=request.FILES) 
+    #     if form.is_valid(): 
+    #         photo_form = form.cleaned_data['files'] 
+    #         photo_message = Message.objects.filter(chat=chat, sender=request.user).latest('-created') 
+    #         photo_message.photo=photo_form  
+    #         photo_message.save()
+
+    # else: 
+    #     form = PhotoChat()
+
+
     context = {
-        'chat_id': chat_id,
-        'chat': chat,
-        'histori_chat': histori_chat, 
-        }
+            'chat_id': chat_id,
+            'chat': chat,
+            'histori_chat': histori_chat,
+            #'form': form 
+            } 
+
     return render(request, 'chat/chat_page.html', context=context)
 
 
@@ -69,14 +85,16 @@ def chats(request):
     
     for chat in other_chats:  
         try:
-            last_message_in_chat = chat.messages.latest('created')  
+            last_message_in_chat = chat.messages.latest('created')
             last_user = last_message_in_chat.sender 
+            last_message_in_chat = last_message_in_chat.text_message
         except: 
             last_message_in_chat = 'No message yet' 
             last_user = chat.other_user
+
         another_chats_and_users.append({
             'chat':  chat, 
-            'last_message_in_chat': last_message_in_chat.text_message, 
+            'last_message_in_chat': last_message_in_chat, 
             'last_user': last_user})
 
 

@@ -12,8 +12,11 @@
     {% endif %}
     <div id="chat-log">
             {% for message in histori_chat %}
-               {% if message.sender.id == request.user.id %} 
-               <div class="message user-message"><img src="{{ message.photo }}" width="150" height="200"> <p>{{message.text_message}} {{ message.created }}</p></div>
+               {% if message.sender.id == request.user.id %}  
+                {% if message.photo %}
+                    <img src="{{ message.photo.url }}" width="150" height="200">
+                {% endif %}
+               <div class="message user-message"> <p>{{message.text_message}} {{ message.created }}</p></div>
                 {% else  %}
                 <div class="message other-message"><p>{{ message.text_message }}  {{ message.created }}</p></div>
                 {% endif %}
@@ -23,9 +26,12 @@
             
         </div>
         <div id="chat-input-container"> 
-            <textarea id="chat-message" placeholder="Type message..."></textarea> 
+            {% comment %} <form id='form' method='post' enctype='multipart/form-data' > 
+                {% csrf_token %} {% endcomment %}
+            <textarea id="chat-message" placeholder="Type message..."></textarea>  
             <input id="files"  type='file'></input>
             <button id="send-button">Send</button>
+            {% comment %} </form> {% endcomment %}
         </div>
     </div>
 
@@ -36,9 +42,10 @@
     <input id="chat-message-submit" type="button" value="Send">  
      {% endcomment %}
     {{ chat_id|json_script:"chat_id" }}
-    {{ request.user.id|json_script:"cur_user" }}
+    {{ request.user.id|json_script:"cur_user" }}  
 
-<script>
+
+<script> 
 
         const chat_id = JSON.parse(document.getElementById('chat_id').textContent);
 
@@ -55,10 +62,22 @@
             const owner = JSON.parse(document.getElementById('cur_user').textContent); 
             const divMessage = document.getElementById('chat-log');
             // fix it
-            if (data.owner ===  owner) {
-                divMessage.innerHTML += `<div class="message user-message"><img src='${data.content}' width="150" height="200"> </img>${data.message} ${data.time}</div>`;
+            if (data.owner ===  owner) { 
+                if(data.content){
+
+                    divMessage.innerHTML += `<div class="message user-message"> <img src='${data.content}' width="150" height="200"></img>${data.message} ${data.time}</div>`;
+                } 
+                else{
+                    divMessage.innerHTML += `<div class="message user-message">${data.message} ${data.time}</div>`;
+
+                }
             }  else  { 
-                divMessage.innerHTML += `<div class="message  other-message">${data.message}  ${data.time}</div>`;
+                if(data.content){
+                    ivMessage.innerHTML += `<div class="message  other-message"><img src='${data.content}' width="150" height="200"></img>${data.message}  ${data.time}</div>`;
+                }else{
+
+                    divMessage.innerHTML += `<div class="message  other-message">${data.message}  ${data.time}</div>`;
+                }
             }
         };
 
@@ -80,26 +99,51 @@
             const owner = JSON.parse(document.getElementById('cur_user').textContent);   
 
             const messageFiles = document.getElementById('files'); 
-            const files = messageFiles.files[0];  
+            const files = messageFiles.files[0];   
 
-            const reader = new FileReader(); 
 
-            reader.onloadend = function() {
-                const data = reader.result.split(',')[1];
+            // check 
+            if(files){
+
+                const reader = new FileReader(); 
+    
+                reader.onloadend = function() {
+                    const data = reader.result.split(',')[1];
+                    chatSocket.send(JSON.stringify({
+                        'message':  message, 
+                        'content': data
+                    }));
+                    messageInputDom.value = '';
+                };
+                reader.readAsDataURL(files); 
+                messageFiles.value = '';
+            } else{
                 chatSocket.send(JSON.stringify({
                     'message':  message, 
-                    'content': String(data),
+                    'content': 'None'
                 }));
-                messageInputDom.value = '';
-            };
-            reader.readAsDataURL(files);
+            }
+
 
 
                
 
             
         };
- 
+        {% comment %} let form = document.getElementById('form')
+        const formData = new FormData(form);
+
+
+        fetch(`cur_url`, {
+            'method': 'POST', 
+            'headers'  {
+                'X-CSRFToken': '{% csrf_token %}'
+            }, 
+            body: formData
+        })
+        .then(response => responce.json())
+ {% endcomment %}
+
     </script>
 
 

@@ -21,6 +21,8 @@ class Post(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post_owner', default=1) 
 
     like = models.ManyToManyField(to=User, related_name='post_like', blank=True)
+    dislike = models.ManyToManyField(to=User, related_name='post_dislike', blank=True)
+
 
 
     create_time= models.DateTimeField(auto_now_add=True) 
@@ -42,6 +44,8 @@ class Comment(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner') 
 
     like = models.ManyToManyField(to=User, related_name='comment_like', blank=True)
+    dislike = models.ManyToManyField(to=User, related_name='comment_dislike', blank=True)
+
 
     created = models.DateTimeField(auto_now_add=True) 
     text = models.TextField(max_length=100) 

@@ -43,12 +43,16 @@ from django.contrib.auth.models import User
 #     context = {'form': form}
 #     return render(request, 'post/create_post.html', context=context)
 
-@login_required(login_url='users:login')
+@login_required()
 def list_post(request, username):  
     owner = User.objects.get(username=username)
-    list_posts = get_list_or_404(Post, owner=owner, status='Pb') 
+    list_posts = get_list_or_404(Post, owner=owner, status='Pb')[::-1] 
+    
+    
 
-    return render(request, 'post/list_post.html', {'list_posts': list_posts})
+    context = {'list_posts': list_posts}
+
+    return render(request, 'post/list_post.html', context=context)
 
 
 

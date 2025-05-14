@@ -684,30 +684,9 @@ body {
     transition: transform 0.2s ease;
   }
   
-  .like button:hover img,
-  .dislike button:hover img {
+  .like button:hover svg,
+  .dislike button:hover svg {
     transform: scale(1.2);
     opacity: 0.8;
   }
   
-  .like img, .dislike img {
-    width: 32px;
-    height: 32px;
-    stroke: gray;
-    fill: none;
-    transition: stroke 0.3s, fill 0.3s;
-  }
-  /* 
-  
-  after click
-
-  stroke: red;
-  fill: red; */
-
-
-  /* Стиль для лічильників */
-  .like p, .dislike p {
-    margin-top: 5px;
-    font-size: 14px;
-    color: #555;
-  }

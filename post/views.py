@@ -5,7 +5,7 @@ from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required 
 from django.views.decorators.http import require_GET, require_POST
 from django.contrib.auth.models import User 
-
+import json
 
 # @login_required(login_url='users:login')
 # def create_post(request):  
@@ -46,7 +46,11 @@ from django.contrib.auth.models import User
 @login_required()
 def list_post(request, username):  
     owner = User.objects.get(username=username)
-    list_posts = get_list_or_404(Post, owner=owner, status='Pb')[::-1] 
+    list_posts = get_list_or_404(Post, owner=owner, status='Pb')[::-1]  
+
+    # if request.method == "POST": 
+
+
     
     
 
@@ -56,3 +60,26 @@ def list_post(request, username):
 
 
 
+def post(request, post_id): 
+    post = Post.objects.get(id=post_id)  
+ 
+
+
+    if request.method == 'POST': 
+        action = json.loads(request.body)['action']  
+
+        # перевірити
+        if action == 'like':  
+            if request.user in  post.like.all():  
+                post.like.remove(request.user)
+            else:
+                post.like.add(request.user) 
+        else: 
+            if request.user in  post.dislike.all():  
+                post.dislike.remove(request.user)
+            else:
+                post.dislike.add(request.user)
+
+    context = {'post': post}
+
+    return render(request, 'includes/like.html', context=context)

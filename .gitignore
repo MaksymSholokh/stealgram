@@ -1,25 +1,24 @@
 .env 
 
 
-# Python файли кешу
+
 __pycache__/
 *.pyc
 *.pyo
 
-# Віртуальне середовище
+
 venv/
 
-# База даних SQLite
+
 db.sqlite3
 
-# Налаштування редакторів
 .vscode/
 .idea/
 
-# Статичні файли, які генеруються автоматично
 staticfiles/
 media/ 
 
 
 cert.key
-cert.crt
+cert.crt 
+dump.rdb

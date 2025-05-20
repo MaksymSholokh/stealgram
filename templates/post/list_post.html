@@ -40,10 +40,7 @@
                         </button>                      
                         <p>{{post.dislike.count}}</p>
                     </div>
-                    <div class='comment'>
-                        <button>  comment </button>  
-                        <p>quantity comment</p>
-                    </div> 
+                    {% include "includes/post_comment.html" %}
                     <div class='share'>
                         <button class='share'> share</button>
                     </div>
@@ -56,7 +53,8 @@
   
     
     
-    <script>
+    <script> 
+        // like/dislike
         document.querySelectorAll('.like,  .dislike  ').forEach(block => { 
             const button = block.querySelector('button') 
             const p = block.querySelector('p')  
@@ -110,7 +108,11 @@
             }
         }
         return cookieValue;
-    }
+    }; 
+
+
+
+
     </script>
 {% endblock content %} 
     

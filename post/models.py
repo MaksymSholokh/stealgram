@@ -49,4 +49,4 @@ class Comment(models.Model):
 
     created = models.DateTimeField(auto_now_add=True) 
     text = models.TextField(max_length=100) 
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post') 
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comment_post') 

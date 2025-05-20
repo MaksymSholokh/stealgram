@@ -60,26 +60,35 @@
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             const owner = JSON.parse(document.getElementById('cur_user').textContent); 
+            const divMessage = document.getElementById('chat-log'); 
+
+
+            addMessageToChat(data, currentUserId);
+
+            // fix it  make function
+            
+        }; 
+
+
+        function addMessageToChat({ message, content, owner, time }, currentUserId) {
             const divMessage = document.getElementById('chat-log');
-            // fix it
-            if (data.owner ===  owner) { 
-                if(data.content){
+            const isCurrentUser = owner === currentUserId;
 
-                    divMessage.innerHTML += `<div class="message user-message"> <img src='${data.content}' width="150" height="200"></img>${data.message} ${data.time}</div>`;
-                } 
-                else{
-                    divMessage.innerHTML += `<div class="message user-message">${data.message} ${data.time}</div>`;
+            const imgHTML = content && content !== 'None'
+                ? `<img src="${content}" width="150" height="200">`
+                : '';
 
-                }
-            }  else  { 
-                if(data.content){
-                    ivMessage.innerHTML += `<div class="message  other-message"><img src='${data.content}' width="150" height="200"></img>${data.message}  ${data.time}</div>`;
-                }else{
+            const messageClass = isCurrentUser ? 'user-message' : 'other-message';
 
-                    divMessage.innerHTML += `<div class="message  other-message">${data.message}  ${data.time}</div>`;
-                }
-            }
+            const html = `
+                <div class="message ${messageClass}">
+                    ${imgHTML} ${message} ${time}
+                </div>
+            `;
+
+            divMessage.insertAdjacentHTML('beforeend', html);
         };
+
 
         chatSocket.onclose = function(e) {
             console.error('Chat socket closed unexpectedly');
@@ -99,7 +108,10 @@
             const owner = JSON.parse(document.getElementById('cur_user').textContent);   
 
             const messageFiles = document.getElementById('files'); 
-            const files = messageFiles.files[0];   
+            const files = messageFiles.files[0];  
+
+            let mes2 = document.getElementById('chat-message').value;
+            alert(mes2);
 
 
             // check 
@@ -108,7 +120,8 @@
                 const reader = new FileReader(); 
     
                 reader.onloadend = function() {
-                    const data = reader.result.split(',')[1];
+                    const data = reader.result.split(',')[1];  
+ 
                     chatSocket.send(JSON.stringify({
                         'message':  message, 
                         'content': data
@@ -154,3 +167,20 @@
 
 
 {% endblock content %}
+if (data.owner ===  owner) { 
+                if(data.content){
+
+                    divMessage.innerHTML += `<div class="message user-message"> <img src='${data.content}' width="150" height="200"></img>${data.message} ${data.time}</div>`;
+                } 
+                else{
+                    divMessage.innerHTML += `<div class="message user-message">${data.message} ${data.time}</div>`;
+
+                }
+            }  else  { 
+                if(data.content){
+                    divMessage.innerHTML += `<div class="message  other-message"><img src='${data.content}' width="150" height="200"></img>${data.message}  ${data.time}</div>`;
+                }else{
+
+                    divMessage.innerHTML += `<div class="message  other-message">${data.message}  ${data.time}</div>`;
+                }
+            }

@@ -47,11 +47,6 @@ import json
 def list_post(request, username):  
     owner = User.objects.get(username=username)
     list_posts = get_list_or_404(Post, owner=owner, status='Pb')[::-1]  
-
-    # if request.method == "POST": 
-
-
-    
     
 
     context = {'list_posts': list_posts}
@@ -62,6 +57,7 @@ def list_post(request, username):
 
 def post(request, post_id): 
     post = Post.objects.get(id=post_id)  
+    users_comment = post.comment_post.filter(owner=request.user).order_by()
  
 
 
@@ -82,4 +78,4 @@ def post(request, post_id):
 
     context = {'post': post}
 
-    return render(request, 'includes/like.html', context=context)
+    return render(request, 'includes/post_comment.html', context=context)

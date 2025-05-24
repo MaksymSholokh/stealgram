@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User 
 from users.models import user_dir_path
@@ -28,7 +29,7 @@ class Post(models.Model):
     create_time= models.DateTimeField(auto_now_add=True) 
     rewrite_time = models.DateTimeField(auto_now=True) 
     text = models.TextField(max_length=10000) 
-    photo = models.ImageField(upload_to=user_dir_path, blank=True, null=True) 
+    photo = models.ImageField(upload_to=f"post/{timezone.now().strftime('%Y/%m/%d')}/", blank=True, null=True) 
     video = models.FileField(upload_to=user_dir_path,  blank=True, null=True) 
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default='Dr')
 

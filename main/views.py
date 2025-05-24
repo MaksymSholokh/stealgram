@@ -19,9 +19,9 @@ def index(request):
 @login_required(login_url='users:login')
 def q_search(request): 
     query = request.GET.get('q') 
-    print(query)
+
     search = user_search(query)#.exclude(id=request.user.id) 
-    print(search)
+
 
     friends = list_friends(request.user) 
     

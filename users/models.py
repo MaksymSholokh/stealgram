@@ -4,8 +4,9 @@ from django.utils import timezone
 # Create your models here.
 
 
-def user_dir_path(instance, filename):
-    return f"{instance.user.username}/{timezone.now().strftime('%Y/%m/%d')}/{filename}"
+def user_dir_path(instance, filename): 
+    
+    return f"{instance.user.username}/{timezone.now().strftime('%Y/%m/%d')}/{filename}/"
 
 class Profile(models.Model):  
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')

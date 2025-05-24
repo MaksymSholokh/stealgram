@@ -6,42 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET, require_POST
 from django.contrib.auth.models import User 
 import json
-
-# @login_required(login_url='users:login')
-# def create_post(request):  
-#     #post = Post.objects.create(user=request.user, status=Post.STATUS_CHOICES.Draft) 
-#     if request.method == 'POST':
-#         form = PostForm(request.POST, request.FILES)
-#         if form.is_valid(): 
-#             post = form.save(commit=False) 
-#             post.user = request.user 
-#             post.save() 
-#             return redirect('post:list_posts', request.user.username)
-#     else: 
-#         form = PostForm()
-
-
-#     context = {'form': form, 'test': 'test_something'}
-#     return render(request, 'post/create_post.html', context=context) 
-# @login_required(login_url='users:login')
-# def create_post(request):  
-#     if request.method == 'POST':
-#         # scope 1 - form
-#         form = PostForm(request.POST, request.FILES)
-#         if form.is_valid(): 
-#             post = form.save(commit=False) 
-#             post.user = request.user 
-#             post.save() 
-#             return redirect('user:profile')
-#         # if form is not valid - this context renders form from scope1
-#         context = {'form': form}
-#         return render(request, 'post/create_post.html', context=context)
-#     # this will cach if request.method is not POST
-#     # scope 2 - form
-#     form = PostForm()
-#     # scope 2 - context (same scope as form)
-#     context = {'form': form}
-#     return render(request, 'post/create_post.html', context=context)
+from django.db.models import Count 
+from itertools import chain
 
 @login_required()
 def list_post(request, username):  
@@ -57,25 +23,41 @@ def list_post(request, username):
 
 def post(request, post_id): 
     post = Post.objects.get(id=post_id)  
-    users_comment = post.comment_post.filter(owner=request.user).order_by()
- 
+    #comment = Comment.objects.get(post=post, id=comment_id) 
+    
+    
 
 
-    if request.method == 'POST': 
-        action = json.loads(request.body)['action']  
+    
+    if request.method == 'POST' : 
+        data = json.loads(request.body) 
 
-        # перевірити
-        if action == 'like':  
-            if request.user in  post.like.all():  
-                post.like.remove(request.user)
-            else:
-                post.like.add(request.user) 
-        else: 
-            if request.user in  post.dislike.all():  
-                post.dislike.remove(request.user)
-            else:
-                post.dislike.add(request.user)
 
-    context = {'post': post}
+        if data['action']:  
+            action = data['action'] 
+            query_action = getattr(post, action)
+            query_action.remove(request.user) if request.user in  query_action.all() else   query_action.add(request.user)
+        # try:
+        #     action = data['action']  
 
-    return render(request, 'includes/post_comment.html', context=context)
+        #     # перевірити
+        #     if action == 'like':  
+        #         post.like.remove(request.user) if request.user in  post.like.all() else   post.like.add(request.user)
+        #     else: 
+        #         post.dislike.remove(request.user) if request.user in  post.dislike.all() else post.dislike.add(request.user) 
+        # except:  
+        else:
+            
+            text_comment = data['text_comment']
+            Comment.objects.create(
+                owner=request.user, 
+                text=text_comment, 
+                post=post,
+            )
+     
+
+
+
+    
+
+    return render(request, 'post/list_post.html')

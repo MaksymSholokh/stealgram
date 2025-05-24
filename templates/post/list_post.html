@@ -1,5 +1,6 @@
 {% extends "base.html" %} 
-{% load static %}
+{% load static %} 
+{% load post_tags %}
 
 {% block content %}
     <div class="post-list">
@@ -26,21 +27,27 @@
                         </video>
                     {% endif %}
                 <div class='like-comment-share'> 
-                    {% comment %} мб зробити інклуд {% endcomment %}
-                    <div class='like' id='{{ post.id }}'>
-                        <button> 
+                        <div data-type='post'> 
                             {% include "includes/like.html" %}
-                        </button>
-                        <p> {{post.like.count}} </p>
-                    </div> 
-
-                    <div class='dislike' id='{{ post.id }}'> 
-                        <button> 
                             {% include "includes/dislike.html" %} 
-                        </button>                      
-                        <p>{{post.dislike.count}}</p>
-                    </div>
-                    {% include "includes/post_comment.html" %}
+                        </div>
+                        <div class='comment' id='{{ post.id }}'>
+                            <button>  comment </button>  
+                            <p>{{ post.comment.count }}</p> 
+                            <div id="comment-form">
+                                <input  class="leave_comment">
+                                <button id='comment_button' type="submit">Додати коментар</button>
+                            </div>
+                            <div class='modal_comment' data-type="comment"> 
+                                {% order_comment post.comment_post.all request.user as comments %}
+                                {% for comment in comments %}
+                                    {{ comment.text }}
+                                    {{ comment.created }}
+                                    {% comment %} {% include "includes/like.html" %}
+                                    {% include "includes/dislike.html" %}  {% endcomment %}
+                                {% endfor %}                              
+                            </div>
+                        </div> 
                     <div class='share'>
                         <button class='share'> share</button>
                     </div>
@@ -49,36 +56,62 @@
                 </div>
             </div>
         {% endfor %}
-    </div>
-  
-    
+    </div> 
     
     <script> 
+        document.querySelectorAll('.comment').forEach(commentBlock => {  
+
+            const url = `/post/${commentBlock.id}/` 
+
+            const commentInput = commentBlock.querySelector('.leave_comment'); 
+            const commentsContainer = commentBlock.querySelector('.modal_comment'); 
+            const commentButton  = commentBlock.querySelector('#comment_button'); 
+
+            if (commentButton) {
+                commentButton.addEventListener('click', event => {  
+                    const textComment = commentInput.value.trim(); 
+
+                    if (textComment !== '') {
+                        const newComment = document.createElement('p');
+                        newComment.className = 'user_comment';
+                        newComment.textContent = textComment;  
+
+                        let data = {'text_comment': textComment}
+
+                        sendData(url, data)
+
+                        commentsContainer.appendChild(newComment); 
+
+                        commentInput.value = ''; 
+                    }
+                });
+            }
+        });
+
+
+
         // like/dislike
         document.querySelectorAll('.like,  .dislike  ').forEach(block => { 
             const button = block.querySelector('button') 
             const p = block.querySelector('p')  
 
             const url = `/post/${block.id}/`  
-            const action = block.className
+            const action = block.className 
+
+            //  more abstract like
+            const content_type = block.parentElement.dataset.type;   
+            block.id = content_type.id;
+
+
+
+
+
+            const data = {'action': action,  'type': content_type}
             
-
-
             button.addEventListener('click', (event) => { 
+                sendData(url, data)
 
-
-                fetch(url, {
-                    method: 'POST', 
-                    headers: {
-                        'Content-Type': 'application/json', 
-                        'X-CSRFToken': getCookie('csrftoken') 
-
-                        
-                    
-                    }, 
-                    body:  JSON.stringify({'action': action})
-                })
-                .then(response => response.json());
+                
 
 
                 const svg = event.target;  
@@ -108,7 +141,23 @@
             }
         }
         return cookieValue;
-    }; 
+    };  
+
+
+    function sendData(url, data){
+        fetch(url, {
+            method: 'POST', 
+            headers: {
+            'Content-Type': 'application/json', 
+            'X-CSRFToken': getCookie('csrftoken') 
+
+                        
+                    
+            }, 
+            body:  JSON.stringify(data)
+            })
+        .then(response => response.json());
+    };
 
 
 

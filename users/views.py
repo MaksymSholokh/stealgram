@@ -125,8 +125,12 @@ def profile_user(request, username):
             draft_post.text += new_s['text']
             draft_post.save()  
         else: 
-            form = PostForm(request.POST, request.FILES)
-            if form.is_valid():  
+            form = PostForm(request.POST, request.FILES) 
+            
+            if form.is_valid(): 
+                photo = form.cleaned_data['photo']
+                draft_post.photo = photo
+                print(form.files, draft_post, sep='/n')
                 draft_post.save_pb()
                 return redirect(request.META.get('HTTP_REFERER', '/')) 
 

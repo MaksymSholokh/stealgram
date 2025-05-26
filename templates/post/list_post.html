@@ -25,11 +25,15 @@
                             <source src="{{ post.video.url }}" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
-                    {% endif %}
+                    {% endif %} 
+                </div>
                 <div class='like-comment-share'> 
-                        <div data-type='post'> 
-                            {% include "includes/like.html" %}
-                            {% include "includes/dislike.html" %} 
+                        <div class='post' id='{{ post.id }}'>  
+                            {% with obj=post %}
+                            
+                                {% include "includes/like.html" %}
+                                {% include "includes/dislike.html" %} 
+                            {% endwith %}
                         </div>
                         <div class='comment' id='{{ post.id }}'>
                             <button>  comment </button>  
@@ -38,30 +42,62 @@
                                 <input  class="leave_comment">
                                 <button id='comment_button' type="submit">Додати коментар</button>
                             </div>
-                            <div class='modal_comment' data-type="comment"> 
+                            <div class='modal_comment' data-type="comment" id="{{post.id}}"> 
                                 {% order_comment post.comment_post.all request.user as comments %}
-                                {% for comment in comments %}
-                                    {{ comment.text }}
-                                    {{ comment.created }}
-                                    {% comment %} {% include "includes/like.html" %}
-                                    {% include "includes/dislike.html" %}  {% endcomment %}
+                                {% for comment in comments %} 
+                                    <div   class="comment" id='{{comment.id}}'>
+                                        
+                                        {{ comment.text }}
+                                        {{ comment.created }} 
+                                        {% with obj=comment %}
+                                        
+                                            {% include "includes/like.html" %}
+                                            {% include "includes/dislike.html" %}  
+                                        {% endwith %}
+                                    </div>
                                 {% endfor %}                              
                             </div>
                         </div> 
-                    <div class='share'>
+                    <div class='share'  id="{{post.id}}">
                         <button class='share'> share</button>
                     </div>
                     {% comment %} мб зробити інклуд {% endcomment %}
-                    </div>
                 </div>
             </div>
         {% endfor %}
     </div> 
     
-    <script> 
-        document.querySelectorAll('.comment').forEach(commentBlock => {  
+    <script>  
 
-            const url = `/post/${commentBlock.id}/` 
+
+        //share 
+        document.querySelectorAll('.share').forEach(shareBlock => { 
+            const postId = shareBlock.id;
+            const url  = `/post/${postId}/`;
+            const shareButton =   shareBlock.querySelector('#button');
+
+            const postShare = shareBlock.parentNode.parentNode
+            console.log(postShare)
+
+            const data = {'action': 'share', 'post': postShare};
+
+
+
+            //shareButton.addEventListener('click', event => { 
+
+
+            //})
+
+        })
+
+
+
+        //comment
+        document.querySelectorAll('.comment').forEach(commentBlock => {   
+
+            postId = String(commentBlock.parentNode.id);
+
+            const url = `/post/${postId}/` 
 
             const commentInput = commentBlock.querySelector('.leave_comment'); 
             const commentsContainer = commentBlock.querySelector('.modal_comment'); 
@@ -76,7 +112,7 @@
                         newComment.className = 'user_comment';
                         newComment.textContent = textComment;  
 
-                        let data = {'text_comment': textComment}
+                        let data = {'action': 'leave_comment',   'text_comment': textComment}
 
                         sendData(url, data)
 
@@ -95,24 +131,26 @@
             const button = block.querySelector('button') 
             const p = block.querySelector('p')  
 
+            //console.log('123', block.parentNode.className, block.parentNode.id)
+
             const url = `/post/${block.id}/`  
             const action = block.className 
 
             //  more abstract like
-            const content_type = block.parentElement.dataset.type;   
-            block.id = content_type.id;
+            const content_class = String(block.parentNode.className); 
+            const content_id = String(block.parentNode.id); 
+
+            //console.log(content_class, content_id)
+            //block.id = content_type.id; 
 
 
+            //content_type
 
 
-
-            const data = {'action': action,  'type': content_type}
+            const data = {'action': action,  'type': content_class, 'id': content_id}
             
             button.addEventListener('click', (event) => { 
                 sendData(url, data)
-
-                
-
 
                 const svg = event.target;  
                 let countr = Number(p.textContent);
@@ -128,23 +166,24 @@
             });
             
         });    
-       function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let cookie of cookies) {
-                cookie = cookie.trim();
-                if (cookie.startsWith(name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
+        function getCookie(name) {
+         let cookieValue = null;
+         if (document.cookie && document.cookie !== '') {
+             const cookies = document.cookie.split(';');
+             for (let cookie of cookies) {
+                 cookie = cookie.trim();
+                 if (cookie.startsWith(name + '=')) {
+                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                     break;
+                 }
+             }
+         }
+         return cookieValue;
     };  
 
 
-    function sendData(url, data){
+    function sendData(url, data){ 
+        //console.log(data)
         fetch(url, {
             method: 'POST', 
             headers: {

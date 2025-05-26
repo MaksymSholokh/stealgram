@@ -23,37 +23,33 @@ def list_post(request, username):
 
 def post(request, post_id): 
     post = Post.objects.get(id=post_id)  
-    #comment = Comment.objects.get(post=post, id=comment_id) 
-    
-    
-
-
     
     if request.method == 'POST' : 
         data = json.loads(request.body) 
 
+        action = data['action'] 
 
-        if data['action']:  
-            action = data['action'] 
-            query_action = getattr(post, action)
-            query_action.remove(request.user) if request.user in  query_action.all() else   query_action.add(request.user)
-        # try:
-        #     action = data['action']  
-
-        #     # перевірити
-        #     if action == 'like':  
-        #         post.like.remove(request.user) if request.user in  post.like.all() else   post.like.add(request.user)
-        #     else: 
-        #         post.dislike.remove(request.user) if request.user in  post.dislike.all() else post.dislike.add(request.user) 
-        # except:  
-        else:
+        if data['action'] in ['like', 'dislike']: 
+             
+            model = data['type'] 
+            id = data['id'] 
             
+
+
+            model_get = post if model=='post' else   Comment.objects.get(post=post, id=id)
+            query_action = getattr(model_get, action) 
+            print(query_action)
+            query_action.remove(request.user) if request.user in  query_action.all() else   query_action.add(request.user) 
+
+        elif action == 'leave_comment':
             text_comment = data['text_comment']
             Comment.objects.create(
                 owner=request.user, 
                 text=text_comment, 
                 post=post,
-            )
+            ) 
+        elif action == 'share': 
+            pass
      
 
 

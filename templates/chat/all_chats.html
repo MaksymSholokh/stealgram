@@ -7,7 +7,7 @@
 <div class="chat-list-container">
     <h2>Chats not read message</h2>
     <ul class="chat-list">
-        {% for chat in chats_and_user %}
+        {% for chat in chats_and_user %} 
         <li class="chat-item">
             <a href="{% url 'chat:chat_two_users' chat.chats.id %}">
                 <div class="chat-avatar">   

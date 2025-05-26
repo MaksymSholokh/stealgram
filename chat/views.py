@@ -95,8 +95,15 @@ def chats(request):
         another_chats_and_users.append({
             'chat':  chat, 
             'last_message_in_chat': last_message_in_chat, 
-            'last_user': last_user})
+            'last_user': last_user}) 
+        
+    object_share = request.GET.get('obj')
+    if object_share:  
+        id_object = request.GET.get('obj_id')
+        object = getattr(object_share, id_object) 
+        
 
 
     context = {'another_chats_and_users': another_chats_and_users, 'chats_and_user': chats_and_user} 
-    return render(request, 'chat/all_chats.html', context)
+    return render(request, 'chat/all_chats.html', context) 
+

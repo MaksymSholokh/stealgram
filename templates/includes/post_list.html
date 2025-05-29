@@ -1,0 +1,66 @@
+{% load post_tags %}
+
+
+{% for post in list_posts %}
+            <div class="post">
+                <div class="post-header">
+                    <span class="post-owner">{{ post.owner }}</span>
+                    <span class="post-time">{{ post.create_time }}</span>
+                </div>
+                {% if post.rewrite_time %}
+                    <span class="post-time">{{ post.rewrite_time }}</span>
+                {% endif %}
+                <div class="post-content">
+                    {{ post.text|truncatechars:75 }}
+                </div>
+                <div class="post-media">
+                    {% if post.photo %}
+                        <img src="{{ post.photo.url }}" alt="Post image">
+                    {% endif %}
+                    {% if post.video %}
+                        <video controls>
+                            <source src="{{ post.video.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    {% endif %} 
+                </div>
+                <div class='like-comment-share'> 
+                        <div class='post' id='{{ post.id }}'>  
+                            {% with obj=post %}
+                            
+                                {% include "includes/like.html" %}
+                                {% include "includes/dislike.html" %} 
+                            {% endwith %}
+                        </div>
+                        <div class='comment' id='{{ post.id }}'>
+                            <button>  comment </button>  
+                            <p>{{ post.comment.count }}</p> 
+                            <div id="comment-form">
+                                <input  class="leave_comment">
+                                <button id='comment_button' type="submit">Додати коментар</button>
+                            </div>
+                            <div class='modal_comment' data-type="comment" id="{{post.id}}"> 
+                                {% order_comment post.comment_post.all request.user as comments %}
+                                {% for comment in comments %} 
+                                    <div   class="comment" id='{{comment.id}}'>
+                                        
+                                        {{ comment.text }}
+                                        {{ comment.created }} 
+                                        {% with obj=comment %}
+                                        
+                                            {% include "includes/like.html" %}
+                                            {% include "includes/dislike.html" %}  
+                                        {% endwith %}
+                                    </div>
+                                {% endfor %}                              
+                            </div>
+                        </div> 
+                    <div class='share'  id="{{post.id}}">
+                        <button class='share'> share</button>
+                    </div>
+                </div>
+            </div> 
+
+{% endfor %} 
+
+

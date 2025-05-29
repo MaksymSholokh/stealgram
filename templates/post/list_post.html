@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="post-list">
-        {% for post in list_posts %}
+        {% comment %} {% for post in list_posts %}
             <div class="post">
                 <div class="post-header">
                     <span class="post-owner">{{ post.owner }}</span>
@@ -61,13 +61,52 @@
                     <div class='share'  id="{{post.id}}">
                         <button class='share'> share</button>
                     </div>
-                    {% comment %} мб зробити інклуд {% endcomment %}
                 </div>
             </div>
-        {% endfor %}
+        {% endfor %}  {% endcomment %} 
+        {% include "includes/post_list.html" %} 
+        
     </div> 
+    {{ tnext_page }}
+    {% if True %}
     
-    <script>  
+        <button class='pagination'>more content</button>
+    {% endif %} 
+    
+
+
+
+    <script>    
+        // pagination  
+        let page = 1;
+        
+        document.querySelector('.pagination').addEventListener('click', event => { 
+            page += 1 
+            let url = `${window.location.pathname}?page=${page}`;  
+            console.log(url)
+            
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())   
+            .then(data => {
+                let cont = document.querySelector('.post-list'); 
+                cont.insertAdjacentHTML('beforeend', data.new_page)
+
+            })
+
+            //cont.innerHTML = data.new_page })
+
+            
+
+
+        });
+
+
+
+    
 
 
         //share 
@@ -77,7 +116,7 @@
             const shareButton =   shareBlock.querySelector('#button');
 
             const postShare = shareBlock.parentNode.parentNode
-            console.log(postShare)
+            //console.log(postShare)
 
             const data = {'action': 'share', 'post': postShare};
 
@@ -88,7 +127,7 @@
 
             //})
 
-        })
+        });
 
 
 
@@ -179,24 +218,24 @@
              }
          }
          return cookieValue;
-    };  
+        };  
 
 
-    function sendData(url, data){ 
-        //console.log(data)
-        fetch(url, {
-            method: 'POST', 
-            headers: {
-            'Content-Type': 'application/json', 
-            'X-CSRFToken': getCookie('csrftoken') 
+        function sendData(url, data){ 
+            //console.log(data)
+            fetch(url, {
+                method: 'POST', 
+                headers: {
+                'Content-Type': 'application/json', 
+                'X-CSRFToken': getCookie('csrftoken') 
 
+                            
                         
-                    
-            }, 
-            body:  JSON.stringify(data)
-            })
-        .then(response => response.json());
-    };
+                }, 
+                body:  JSON.stringify(data)
+                })
+                .then(response => response.json());
+        };
 
 
 

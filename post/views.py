@@ -1,4 +1,5 @@
 from django.shortcuts import get_list_or_404, redirect, render
+from django.urls import reverse
 from .models import Post, Comment 
 from .forms import PostForm, CommentForm
 # Create your views here.
@@ -8,14 +9,41 @@ from django.contrib.auth.models import User
 import json
 from django.db.models import Count 
 from itertools import chain
+from django.core.paginator import Paginator
+from django.template.loader import render_to_string
+from django.http import HttpResponse, JsonResponse
+
+
+
 
 @login_required()
 def list_post(request, username):  
+
+
+
     owner = User.objects.get(username=username)
-    list_posts = get_list_or_404(Post, owner=owner, status='Pb')[::-1]  
+    #list_posts = get_list_or_404(Post, owner=owner, status='Pb')[::-1]  
+    list_posts = Post.objects.filter(owner=owner, status='Pb').order_by('-create_time')   
+
+
+    paginator = Paginator(list_posts, 2)
+    page_number = request.GET.get("page", 1)  
+
+    if  int(page_number) > paginator.num_pages: 
+        return redirect(request.path)
+
+    page_obj = paginator.get_page(page_number) 
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':  
+        
+        add_content = render_to_string('includes/post_list.html', context={'list_posts': page_obj}, request=request)  
+        return JsonResponse({"new_page": add_content})  
+
+
+
     
 
-    context = {'list_posts': list_posts}
+    context = {'list_posts': page_obj, "next_page": page_obj.has_next()}
 
     return render(request, 'post/list_post.html', context=context)
 

@@ -1,0 +1,23 @@
+<div class="post">
+    <div class="post-header">
+        <span class="post-owner">{{ post.owner }}</span>
+        <span class="post-time">{{ post.create_time }}</span>
+    </div>
+    {% if post.rewrite_time %}
+        <span class="post-time">{{ post.rewrite_time }}</span>
+    {% endif %}
+    <div class="post-content">
+        {{ post.text }}
+    </div>
+    <div class="post-media">
+        {% if post.photo %}
+            <img src="{{ post.photo.url }}" alt="Post image">
+        {% endif %}
+        {% if post.video %}
+            <video controls>
+                <source src="{{ post.video.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% endif %} 
+    </div> 
+</div>

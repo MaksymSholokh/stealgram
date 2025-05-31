@@ -11,6 +11,7 @@ from .models import Message, ChatTwoUser
 
 
 
+
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["chat_id"]

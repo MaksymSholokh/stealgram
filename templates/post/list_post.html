@@ -67,7 +67,7 @@
         {% include "includes/post_list.html" %} 
         
     </div> 
-    {{ tnext_page }}
+  
     {% if True %}
     
         <button class='pagination'>more content</button>
@@ -111,21 +111,21 @@
 
         //share 
         document.querySelectorAll('.share').forEach(shareBlock => { 
-            const postId = shareBlock.id;
-            const url  = `/post/${postId}/`;
-            const shareButton =   shareBlock.querySelector('#button');
+            const contentId = shareBlock.id;
+            const shareButton =   shareBlock.querySelector('button');
+            const chats = shareBlock.querySelector('a');
+            const classShare = chats.className; 
+            
 
-            const postShare = shareBlock.parentNode.parentNode
-            //console.log(postShare)
-
-            const data = {'action': 'share', 'post': postShare};
-
+            const data = {'action': 'share', 'content': classShare, 'id': contentId}; 
 
 
-            //shareButton.addEventListener('click', event => { 
 
+            chats.addEventListener('click', event => {  
+                sessionStorage.setItem('share', JSON.stringify(data));  
+                console.log(sessionStorage.getItem('share'))
 
-            //})
+            });
 
         });
 

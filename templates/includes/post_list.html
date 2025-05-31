@@ -55,9 +55,12 @@
                                 {% endfor %}                              
                             </div>
                         </div> 
-                    <div class='share'  id="{{post.id}}">
+                    {% comment %} <div class='share'  id="{{post.id}}">
                         <button class='share'> share</button>
-                    </div>
+                    </div> {% endcomment %} 
+                    {% with obj=post content_type='post' %}
+                    {% include "includes/share.html" %}
+                    {% endwith %}
                 </div>
             </div> 
 

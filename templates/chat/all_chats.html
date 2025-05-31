@@ -8,6 +8,7 @@
     <h2>Chats not read message</h2>
     <ul class="chat-list">
         {% for chat in chats_and_user %} 
+        <input type='checkbox' class='checkbox' id='{{chat.chat.id}}'>
         <li class="chat-item">
             <a href="{% url 'chat:chat_two_users' chat.chats.id %}">
                 <div class="chat-avatar">   
@@ -15,7 +16,8 @@
                     <img src="chat.other_user.profile.photo.url" alt="Avatar"> 
                     <p>{{ chat.other_user.username }}</p>
                     <p>{{ chat.last_message_in_chat }}</p>  
-                    <p>{{ chat.count_unread_message }}</p>
+                    <p>{{ chat.count_unread_message }}</p> 
+                    
                 </div>
             </a>
         </li>
@@ -26,7 +28,8 @@
 
     <h2>Another messages</h2> 
     <ul class="chat-list">
-        {% for chat in another_chats_and_users %}
+        {% for chat in another_chats_and_users %} 
+            <input type='checkbox' class='checkbox' id='{{chat.chat.id}}'>
         <li class="chat-item">
             <a href="{% url 'chat:chat_two_users' chat.chat.id %}">
                 <div class="chat-avatar">   
@@ -41,6 +44,71 @@
         <p>Чатів поки що немає.</p>
         {% endfor %}
     </ul>
+    <button class='send_content'>send</button>
+</div> 
+
+
+<script> 
+
+    const sendButton = document.querySelector('.send_content')
+
+    const shareData = sessionStorage.getItem('share')  
+    const cheBox =  document.querySelectorAll('.checkbox')
+
+    if(!shareData) {
+        cheBox.forEach(box => {
+            box.style.display = 'none';
+        });
+        sendButton.style.display = 'none'; 
+    }; 
     
-</div>
+    
+    sendButton.addEventListener('click', event => { 
+        const chatList = []; 
+
+        
+        const url = `/chat/share/`; 
+        const sessionBro = sessionStorage.getItem('share')
+
+        cheBox.forEach(chats => {
+            
+            if(chats.checked) {
+                chatList.push(chats.id)
+            };
+        });
+
+        data = {'shareChats': chatList, 'share': JSON.parse(sessionBro)} 
+    
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', 
+                'X-CSRFToken': getCookie('csrftoken')
+            }, 
+            body: JSON.stringify(data)
+        }
+        );  
+        //sessionStorage.removeItem("share");
+    });
+    
+
+
+
+    function getCookie(name) {
+         let cookieValue = null;
+         if (document.cookie && document.cookie !== '') {
+             const cookies = document.cookie.split(';');
+             for (let cookie of cookies) {
+                 cookie = cookie.trim();
+                 if (cookie.startsWith(name + '=')) {
+                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                     break;
+                 }
+             }
+         }
+         return cookieValue;
+    };
+
+
+</script>
 {% endblock %}

@@ -63,7 +63,7 @@
             const divMessage = document.getElementById('chat-log'); 
 
 
-            addMessageToChat(data, currentUserId);
+            addMessageToChat(data, owner);
 
             // fix it  make function
             
@@ -111,7 +111,7 @@
             const files = messageFiles.files[0];  
 
             let mes2 = document.getElementById('chat-message').value;
-            alert(mes2);
+            
 
 
             // check 
@@ -167,7 +167,7 @@
 
 
 {% endblock content %}
-if (data.owner ===  owner) { 
+{% comment %} if (data.owner ===  owner) { 
                 if(data.content){
 
                     divMessage.innerHTML += `<div class="message user-message"> <img src='${data.content}' width="150" height="200"></img>${data.message} ${data.time}</div>`;
@@ -183,4 +183,4 @@ if (data.owner ===  owner) {
 
                     divMessage.innerHTML += `<div class="message  other-message">${data.message}  ${data.time}</div>`;
                 }
-            }
+            } {% endcomment %}

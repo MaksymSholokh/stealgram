@@ -1,3 +1,5 @@
+import json
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from .models import ChatTwoUser, Message
 from django.db.models import Q, Max, Count
@@ -5,7 +7,16 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 import base64 
-from .forms import PhotoChat
+from .forms import PhotoChat 
+
+from post.models import Comment, Post
+from django.template.loader import render_to_string
+from asgiref.sync import async_to_sync
+
+
+from channels.layers import get_channel_layer 
+from django.utils import timezone
+
 # Create your views here.
 
 
@@ -34,20 +45,6 @@ def chat_two_user(request, chat_id):
     except: 
         histori_chat = None   
     
-        
-    
-    
-    # if request.method == 'POST':   
-    #     form = PhotoChat(data=request.FILES) 
-    #     if form.is_valid(): 
-    #         photo_form = form.cleaned_data['files'] 
-    #         photo_message = Message.objects.filter(chat=chat, sender=request.user).latest('-created') 
-    #         photo_message.photo=photo_form  
-    #         photo_message.save()
-
-    # else: 
-    #     form = PhotoChat()
-
 
     context = {
             'chat_id': chat_id,
@@ -107,3 +104,41 @@ def chats(request):
     context = {'another_chats_and_users': another_chats_and_users, 'chats_and_user': chats_and_user} 
     return render(request, 'chat/all_chats.html', context) 
 
+
+
+def share_content(request):   
+    #post = Post
+
+    if request.method == 'POST':  
+        data = json.loads(request.body)  
+        # example
+        # {'shareChats': ['3', '1'], 'share': {'action': 'share', 'content': 'post', 'id': '23'}}
+        send_chats = data['shareChats'] 
+        content_data = data['share'] 
+
+
+
+
+        for chat in send_chats:   
+            id = content_data['id']  
+            type_content = content_data['content']   
+
+            chat = ChatTwoUser.objects.get(id=int(chat))
+
+            if type_content == 'post': 
+                post = Post.objects.get(id=id)  
+                message = render_to_string('includes/short_post_single.html', context={'post': post}, request=request)    
+
+            channel_layer = get_channel_layer()
+            group_name = f'chat_{chat.id}'
+            time = timezone.now()
+
+            async_to_sync(channel_layer.group_send)(
+            group_name, 
+            {"type": "chat.message", "message": message, 'owner': request.user.id, 'time': time.isoformat(), 'content': None })
+
+
+
+
+
+    return HttpResponse('sdg')

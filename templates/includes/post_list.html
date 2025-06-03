@@ -32,6 +32,8 @@
                                 {% include "includes/dislike.html" %} 
                             {% endwith %}
                         </div>
+
+                        
                         <div class='comment' id='{{ post.id }}'>
                             <button>  comment </button>  
                             <p>{{ post.comment.count }}</p> 
@@ -43,7 +45,6 @@
                                 {% order_comment post.comment_post.all request.user as comments %}
                                 {% for comment in comments %} 
                                     <div   class="comment" id='{{comment.id}}'>
-                                        
                                         {{ comment.text }}
                                         {{ comment.created }} 
                                         {% with obj=comment %}
@@ -51,6 +52,7 @@
                                             {% include "includes/like.html" %}
                                             {% include "includes/dislike.html" %}  
                                         {% endwith %}
+                                        {% include 'includes/comments_replies.html' with replies=comment.parent.all %}
                                     </div>
                                 {% endfor %}                              
                             </div>

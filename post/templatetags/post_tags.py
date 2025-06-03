@@ -8,11 +8,11 @@ register = template.Library()
 
 
 @register.simple_tag
-def order_comment(posts, user):  
+def order_comment(comments, user):  
     #comment = Comment.objects.get(post=post, id=comment_id) 
 
-    users_comments = posts.filter(owner=user).order_by('-created')   
-    other_comments = posts.annotate(count_like=Count('like')).order_by('-count_like', '-created').exclude(owner=user) 
+    users_comments = comments.filter(owner=user, parent=None).order_by('-created')   
+    other_comments = comments.annotate(count_like=Count('like')).order_by('-count_like', '-created').exclude(owner=user) 
 
     all_comments =  list(chain(users_comments, other_comments))  
     return all_comments

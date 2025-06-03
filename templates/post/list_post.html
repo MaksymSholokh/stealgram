@@ -133,9 +133,11 @@
 
         //comment
         document.querySelectorAll('.comment').forEach(commentBlock => {   
-
-            postId = String(commentBlock.parentNode.id);
-
+            console.log(this)
+            console.log('123', commentBlock.parentNode) 
+            console.log('125', commentBlock)
+            
+            postId = String(commentBlock.id); 
             const url = `/post/${postId}/` 
 
             const commentInput = commentBlock.querySelector('.leave_comment'); 

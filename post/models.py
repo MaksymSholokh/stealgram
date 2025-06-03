@@ -50,4 +50,6 @@ class Comment(models.Model):
 
     created = models.DateTimeField(auto_now_add=True) 
     text = models.TextField(max_length=100) 
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comment_post') 
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comment_post')  
+
+    parent = models.ForeignKey('self', related_name='comment_answer', blank=True, null=True, on_delete=models.CASCADE) 

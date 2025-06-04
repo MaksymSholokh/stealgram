@@ -12,7 +12,7 @@ from itertools import chain
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 from django.http import HttpResponse, JsonResponse
-
+from django.views.decorators.cache import cache_page
 
 
 
@@ -79,9 +79,5 @@ def post(request, post_id):
         elif action == 'share': 
             pass
      
-
-
-
-    
 
     return render(request, 'post/list_post.html')

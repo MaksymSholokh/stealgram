@@ -1,5 +1,6 @@
 {% comment %} {% extends "base.html" %}  {% endcomment %}
 {% block content %}  
+{% load cache %}
 
 
 
@@ -12,10 +13,10 @@
     {% endif %}
     <div id="chat-log">
             {% for message in histori_chat %}
-               {% if message.sender.id == request.user.id %}  
-                {% if message.photo %}
-                    <img src="{{ message.photo.url }}" width="150" height="200">
-                {% endif %}
+               {% if message.sender.id == request.user.id %}   
+                    {% if message.photo %}
+                        <img src="{{ message.photo.url }}" width="150" height="200">
+                    {% endif %}
                <div class="message user-message"> <p>{{message.text_message}} {{ message.created }}</p></div>
                 {% else  %}
                 <div class="message other-message"><p>{{ message.text_message }}  {{ message.created }}</p></div>

@@ -14,7 +14,10 @@ from django.contrib import messages
 from django.db.models import Q
 from post.forms import PostForm
 import json
-from post.models import Post
+from post.models import Post 
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
+
 # Create your views here.
 
 
@@ -101,7 +104,7 @@ def remove_friend(request, user_id):
     messages.success(request, f"You removed  {user_to_remove.first_name}.")
     return redirect(request.META.get('HTTP_REFERER', '/')) 
 
-
+@cache_page(60 * 15)
 @login_required(login_url='users:login')
 def friends(request): 
     friends  = list_friends(request.user) 
@@ -109,7 +112,7 @@ def friends(request):
     context = {'friends': friends}
     return render(request, 'users/friends.html', context=context) 
 
-
+@cache_page(60*5)
 @login_required(login_url='users:login')
 def profile_user(request, username):  
     user = get_object_or_404(User, username=username) 
@@ -130,8 +133,8 @@ def profile_user(request, username):
             if form.is_valid(): 
                 photo = form.cleaned_data['photo']
                 draft_post.photo = photo
-                print(form.files, draft_post, sep='/n')
-                draft_post.save_pb()
+                draft_post.save_pb() 
+                cache.delete(f'media_posts.{draft_post.id}')
                 return redirect(request.META.get('HTTP_REFERER', '/')) 
 
     form = PostForm() 

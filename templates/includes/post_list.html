@@ -1,5 +1,5 @@
 {% load post_tags %}
-
+{% load cache %}
 
 {% for post in list_posts %}
             <div class="post">
@@ -13,17 +13,20 @@
                 <div class="post-content">
                     {{ post.text|truncatechars:75 }}
                 </div>
-                <div class="post-media">
-                    {% if post.photo %}
-                        <img src="{{ post.photo.url }}" alt="Post image">
-                    {% endif %}
-                    {% if post.video %}
-                        <video controls>
-                            <source src="{{ post.video.url }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    {% endif %} 
-                </div>
+                {% cache 300 media_posts  post.id %}
+                
+                    <div class="post-media">
+                        {% if post.photo %}
+                            <img src="{{ post.photo.url }}" alt="Post image">
+                        {% endif %}
+                        {% if post.video %}
+                            <video controls>
+                                <source src="{{ post.video.url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        {% endif %} 
+                    </div>
+                {% endcache %}
                 <div class='like-comment-share'> 
                         <div class='post' id='{{ post.id }}'>  
                             {% with obj=post %}

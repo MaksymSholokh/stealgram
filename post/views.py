@@ -14,7 +14,9 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.cache import cache_page
 
-
+from rest_framework.views import APIView
+from .serializers import CommentSerialezers
+from rest_framework.response import Response
 
 @login_required()
 def list_post(request, username):  
@@ -80,4 +82,20 @@ def post(request, post_id):
             pass
      
 
-    return render(request, 'post/list_post.html')
+    return render(request, 'post/list_post.html') 
+
+
+
+class CommentApiView(APIView): 
+    def get(self, request, post_id): 
+        posts_comment = Comment.objects.filter(post=post_id) 
+        paginator = Paginator(posts_comment, 2)  # Show 25 contacts per page.
+
+        page_number = request.GET.get("page", 1)
+        page_obj = paginator.get_page(page_number) 
+        context = {"replies": page_obj} 
+        page_comment = render_to_string("includes/comments_replies.html", context=context, request=request) 
+        #sr_data = CommentSerialezers(page_comment).data
+        context = {"new_page_comment": page_comment, 'has_next_page': page_obj.has_next()}
+
+        return JsonResponse(context)

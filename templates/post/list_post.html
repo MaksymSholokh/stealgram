@@ -99,13 +99,48 @@
 
             //cont.innerHTML = data.new_page })
 
+        }); 
+
             
 
+        document.querySelectorAll('.modal_comment').forEach(comment_block => { 
+            let page_comment = 1 
+            let object_id = comment_block.id; 
+              
+            let next_page = true;
 
-        });
+            const req_new_page_comment = () => { 
+                let url_comment = `/post/comment/${object_id}/?page=${page_comment}`
+                if (next_page){
+
+                    fetch(url_comment) 
+                    .then(response => response.json()) 
+                    .then(data => {
+                        if(data.has_next_page === false){
+                            next_page = false;
+                        }
+                        comment_block.insertAdjacentHTML('beforeend', data.new_page_comment) 
+                        page_comment += 1 
+                        });
+            }};
+
+            req_new_page_comment(); 
 
 
+            comment_block.addEventListener('scroll', () => {   
+                alert(444)
+                //if(comment_block.clientHeight >= 10){
+                if (comment_block.scrollTop + comment_block.clientHeight >= comment_block.scrollHeight - 10){
+                    alert(5555)
+                    req_new_page_comment();
+                }
+                
+            });
 
+
+        }); 
+
+        
     
 
 
@@ -131,39 +166,10 @@
 
 
 
-        //comment
-        document.querySelectorAll('.comment').forEach(commentBlock => {   
-            console.log(this)
-            console.log('123', commentBlock.parentNode) 
-            console.log('125', commentBlock)
-            
-            postId = String(commentBlock.id); 
-            const url = `/post/${postId}/` 
+       
+        //comment 
+        
 
-            const commentInput = commentBlock.querySelector('.leave_comment'); 
-            const commentsContainer = commentBlock.querySelector('.modal_comment'); 
-            const commentButton  = commentBlock.querySelector('#comment_button'); 
-
-            if (commentButton) {
-                commentButton.addEventListener('click', event => {  
-                    const textComment = commentInput.value.trim(); 
-
-                    if (textComment !== '') {
-                        const newComment = document.createElement('p');
-                        newComment.className = 'user_comment';
-                        newComment.textContent = textComment;  
-
-                        let data = {'action': 'leave_comment',   'text_comment': textComment}
-
-                        sendData(url, data)
-
-                        commentsContainer.appendChild(newComment); 
-
-                        commentInput.value = ''; 
-                    }
-                });
-            }
-        });
 
 
 
@@ -245,3 +251,36 @@
     </script>
 {% endblock content %} 
     
+ {% comment %} //comment
+        document.querySelectorAll('.comment').forEach(commentBlock => {   
+            console.log(this)
+            console.log('123', commentBlock.parentNode) 
+            console.log('125', commentBlock)
+            
+            postId = String(commentBlock.id); 
+            const url = `/post/${postId}/` 
+
+            const commentInput = commentBlock.querySelector('.leave_comment'); 
+            const commentsContainer = commentBlock.querySelector('.modal_comment'); 
+            const commentButton  = commentBlock.querySelector('#comment_button'); 
+
+            if (commentButton) {
+                commentButton.addEventListener('click', event => {  
+                    const textComment = commentInput.value.trim(); 
+
+                    if (textComment !== '') {
+                        const newComment = document.createElement('p');
+                        newComment.className = 'user_comment';
+                        newComment.textContent = textComment;  
+
+                        let data = {'action': 'leave_comment',   'text_comment': textComment}
+
+                        sendData(url, data)
+
+                        commentsContainer.appendChild(newComment); 
+
+                        commentInput.value = ''; 
+                    }
+                });
+            }
+        }); {% endcomment %}

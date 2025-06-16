@@ -43,8 +43,10 @@
                             <div id="comment-form">
                                 <input  class="leave_comment">
                                 <button id='comment_button' type="submit">Додати коментар</button>
-                            </div>
-                            <div class='modal_comment' data-type="comment" id="{{post.id}}"> 
+                            </div> 
+
+                            {% comment %} test {% endcomment %}
+                            {% comment %} <div class='modal_comment' data-type="comment" id="{{post.id}}"> 
                                 {% order_comment post.comment_post.all request.user as comments %}
                                 {% for comment in comments %} 
                                     <div   class="comment" id='{{comment.id}}'>
@@ -58,7 +60,13 @@
                                         {% include 'includes/comments_replies.html' with replies=comment.parent.all %}
                                     </div>
                                 {% endfor %}                              
-                            </div>
+                            </div>   {% endcomment %}
+
+                            <div class='modal_comment' data-type="comment" id="{{post.id}}"> 
+                                {% include "includes/comments_replies.html" %}                            
+                            </div> 
+
+
                         </div> 
                     {% comment %} <div class='share'  id="{{post.id}}">
                         <button class='share'> share</button>

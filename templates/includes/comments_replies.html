@@ -1,6 +1,6 @@
 {% for reply in replies %}
     <div style="margin-left: 20px;">
-        <p>{{ reply.text }}</p>
+        <p>{{ reply.text }}</p> 
         {% include 'includes/comments_replies.html' with replies=comment.parent.all %}
     </div>
 {% endfor %}

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'chat.apps.ChatConfig',
     'channels', 
     'post.apps.PostConfig',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -176,7 +177,10 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD') 
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  
+
+#geminiapi 
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
 
 

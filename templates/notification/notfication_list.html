@@ -3,16 +3,49 @@
 {% block content %}
 
 
-    {% if notifications %}
-        {% for notification in notifications %}
-            <p>
-            {{ notification.message }}
-            </p>
-                
-        {% endfor %}
+    {% if notifications %} 
+        <div class='notification'>
+            {% for notification in notifications %}
+                <p>
+                {{ notification.message }}
+                </p>
+                    
+            {% endfor %}
+        </div>
     {% else %} 
         No notification yet
-    {% endif %}
+    {% endif %}   
+
+ {{ request.user.username|json_script:"room-name" }}
+
+<script> 
+
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/notification/'
+            + roomName
+            + '/'
+        );
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data); 
+            alert(data.message)
+            let divNot = document.querySelector('.notification');
+            divNot.innerHTML += `<p>${data.message}</p>`
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        
+
+        
+    </script>
+
+
 {% endblock content %}
 
 

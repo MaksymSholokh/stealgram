@@ -7,6 +7,6 @@ from . import views
 app_name = 'notification'
 
 urlpatterns = [
-    path('', views.NotificationApiView.as_view(), name='users_new')
+    path('<slug:username>/', views.NotificationApiView.as_view(), name='username')
 
 ] 

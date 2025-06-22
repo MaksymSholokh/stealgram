@@ -204,4 +204,9 @@ function getCookie(name) {
                 body:  JSON.stringify(data)
                 })
                 .then(response => response.json());
-        }
+        };
+
+
+
+// notification page
+

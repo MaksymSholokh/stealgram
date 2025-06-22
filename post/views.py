@@ -16,7 +16,14 @@ from django.views.decorators.cache import cache_page
 
 from rest_framework.views import APIView
 from .serializers import CommentSerialezers
-from rest_framework.response import Response
+from rest_framework.response import Response 
+
+
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+
+
 
 @login_required()
 def list_post(request, username):  
@@ -66,9 +73,23 @@ def post(request, post_id):
             
 
 
-            model_get = post if model=='post' else   Comment.objects.get(post=post, id=id)
+            model_get = post if model=='post' else   Comment.objects.get(post=post, id=id)  
+            
+             
+ 
+            channel_layer = get_channel_layer() 
+            group_name = 'notification_' + str(model_get.owner.username)  
+            message = 'liked some content, realizied by websoket'
+          
+            async_to_sync(channel_layer.group_send)(group_name, {"type": "chat_message", "message": message}) 
+            print(group_name)
+
+
+
+
+
             query_action = getattr(model_get, action) 
-            print(query_action)
+            #print(query_action)
             query_action.remove(request.user) if request.user in  query_action.all() else   query_action.add(request.user) 
 
         elif action == 'leave_comment':

@@ -18,6 +18,8 @@ from post.models import Post
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
 
+
+from notification.tasks import new_post_notification
 # Create your views here.
 
 
@@ -88,7 +90,12 @@ class CustomeResetPasswordView(PasswordResetView):
 @login_required
 def add_friend(request, user_id):
     user_to_friend = get_object_or_404(User, id=user_id) 
-    Friend.objects.create(from_user=request.user, to_user=user_to_friend)
+    Friend.objects.create(from_user=request.user, to_user=user_to_friend) 
+
+    # for fix  next create signals where            new_fiend.save(commit=True)
+    #new_fiend = Friend(from_user=request.user, to_user=user_to_friend) 
+    # new_fiend.save(commit=False)
+
     messages.success(request, f"You are friend")
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -135,7 +142,14 @@ def profile_user(request, username):
                 photo = form.cleaned_data['photo']
                 draft_post.photo = photo
                 draft_post.save_pb() 
-                cache.delete(f'media_posts.{draft_post.id}')
+                cache.delete(f'media_posts.{draft_post.id}')  
+
+
+                message = f'{request.user.username} create new post' 
+                recipients = request.user.id
+
+                new_post_notification.delay(message=message, recipient = recipients)
+
                 return redirect(request.META.get('HTTP_REFERER', '/')) 
 
     form = PostForm() 

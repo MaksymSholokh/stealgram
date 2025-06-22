@@ -40,6 +40,8 @@
                   </div> 
                 </li>
                 <li><a href="{% url "users:profile" request.user %}">My profile</a></li>
+                <li><a href="{% url "notification:users_new"  %}">Notification</a></li>
+
                 <li><a href="{% url "chat:all_chats" %}">Messages</a></li>
                 <li><a href="{% url 'users:logout' %}">Logout</a></li> 
                 {% else %} 

@@ -82,6 +82,10 @@ def q_search(request):
     return render(request, 'main/search.html', context=context) 
 
 
+
+
+# https://telegram.me/share/url?url=%3C127.0.0.1:8000%3E&text=%3CTEXT%3E
+
 class AskGeminiApi(APIView):  
 
 

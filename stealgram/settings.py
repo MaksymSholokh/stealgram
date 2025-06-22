@@ -50,8 +50,9 @@ INSTALLED_APPS = [
     'social_django', 
     'django_extensions',
     'main.apps.MainConfig',
+    'chat.apps.ChatConfig', 
+    'notification.apps.NotificationConfig',
 
-    'chat.apps.ChatConfig',
     'channels', 
     'post.apps.PostConfig',
     'rest_framework',
@@ -201,4 +202,19 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379",
     }
-}
+} 
+
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework.renderers.TemplateHTMLRenderer'
+    ]
+} 
+
+
+
+CELERY_IMPORTS = ['notification.tasks']
+

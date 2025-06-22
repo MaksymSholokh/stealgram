@@ -95,7 +95,10 @@ class CommentApiView(APIView):
         page_obj = paginator.get_page(page_number) 
         context = {"replies": page_obj} 
         page_comment = render_to_string("includes/comments_replies.html", context=context, request=request) 
-        #sr_data = CommentSerialezers(page_comment).data
+        #sr_data = CommentSerialezers(page_comment).data 
+        # clear
+        # page_comment = posts_comment
+
         context = {"new_page_comment": page_comment, 'has_next_page': page_obj.has_next()}
 
         return JsonResponse(context)

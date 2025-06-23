@@ -43,34 +43,37 @@ function getCookie(name) {
 
 
         //pagination post page
-        let page = 1;
+        window.addEventListener('scroll', () => {
+            let page = 1;
+            const scrollY = window.scrollY || document.documentElement.scrollTop;
+            const visibleHeight = window.innerHeight;
+            const pageHeight = document.documentElement.scrollHeight;
+
+            if (scrollY + visibleHeight >= pageHeight - 50) {
+
+                page += 1 
+                let url = `${window.location.pathname}?page=${page}`;  
+                console.log(url)
+                
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())   
+                .then(data => {
+                    let cont = document.querySelector('.post-list'); 
+                    cont.insertAdjacentHTML('beforeend', data.new_page)
+    
+                })
+
+
+            }
+        });
+
         
-        document.querySelector('.pagination').addEventListener('click', event => { 
-            page += 1 
-            let url = `${window.location.pathname}?page=${page}`;  
-            console.log(url)
-            
-            fetch(url, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())   
-            .then(data => {
-                let cont = document.querySelector('.post-list'); 
-                cont.insertAdjacentHTML('beforeend', data.new_page)
-
-            })
-
-            //cont.innerHTML = data.new_page })
-
-        }); 
 
         //comment 
-
-       
-
-
         document.querySelectorAll('.modal_comment').forEach(comment_block => { 
             let page_comment = 1 
             let object_id = comment_block.id; 
@@ -86,39 +89,27 @@ function getCookie(name) {
                     .then(data => {
                         if(data.has_next_page === false){
                             next_page = false;
-                        }
-                        //comment_block.insertAdjacentHTML('beforeend', data.new_page_comment) 
-                        document.getElementsByClassName('modal_comment')[0].innerHTML += data.new_page_comment
+                        } 
+                        comment_block.insertAdjacentHTML('beforeend', data.new_page_comment) 
+                       
                         page_comment += 1 
                         });
             }};
 
             req_new_page_comment(); 
+            comment_block.addEventListener('click', event => { 
+                if(next_page){
 
+                    req_new_page_comment()
+                }
+            })
 
-            comment_block.addEventListener('scroll', () => {
-                const scrollY = window.scrollY || document.documentElement.scrollTop; 
-                req_new_page_comment(); 
-                alert(123)
-                if(scrollY > 100){
-                    
-                }
-                }
-            
-        ); 
-    });
 
         
-    window.addEventListener('scroll', function () {
-    const scrollY = window.scrollY || document.documentElement.scrollTop; 
-        alert('hi')
-        //req_new_page_comment();
-    // Тут ваша логіка
-    if (scrollY > 100) { 
-        //alert('Сторінка прокручена вниз на 100px або більше')
-        console.log('Сторінка прокручена вниз на 100px або більше');
-        }
-    });
+        });
+
+        
+ 
 
 
         //share 
@@ -208,5 +199,25 @@ function getCookie(name) {
 
 
 
-// notification page
+// notification 
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/notification/'
+            + roomName
+            + '/'
+        );
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data); 
+            alert(data.message)
+            let divNot = document.querySelector('.notification'); 
+            url = `/notification/${roomName}/`
+            divNot.innerHTML += `<a href=${url}><p>${data.message}</p></a>`
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
 

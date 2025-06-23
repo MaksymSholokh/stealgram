@@ -74,17 +74,14 @@ def post(request, post_id):
 
 
             model_get = post if model=='post' else   Comment.objects.get(post=post, id=id)  
-            
-             
+
+
  
             channel_layer = get_channel_layer() 
             group_name = 'notification_' + str(model_get.owner.username)  
             message = 'liked some content, realizied by websoket'
           
             async_to_sync(channel_layer.group_send)(group_name, {"type": "chat_message", "message": message}) 
-            print(group_name)
-
-
 
 
 

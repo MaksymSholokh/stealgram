@@ -689,15 +689,3 @@ body {
     transform: scale(1.2);
     opacity: 0.8;
   }
-.modal_comment {
-    max-height: 400px;
-    overflow-y: auto;
-    border: 1px solid #ccc;  
-    height: 2000px;
-
-} 
-
-
-body{
-    height: 2000px;
-}

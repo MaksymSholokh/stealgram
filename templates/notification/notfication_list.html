@@ -6,9 +6,12 @@
     {% if notifications %} 
         <div class='notification'>
             {% for notification in notifications %}
-                <p>
+                <p  class="status_{{notification.is_read}}" value='{{notification.id}}'>
                 {{ notification.message }}
-                </p>
+                </p> 
+
+
+                <p>{{notification.is_read}}</p>
                     
             {% endfor %}
         </div>
@@ -18,7 +21,7 @@
 
 
 
-
+{{ request.user.username|json_script:"recipient" }}
 {% endblock content %}
 
 

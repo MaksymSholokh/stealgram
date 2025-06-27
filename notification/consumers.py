@@ -1,8 +1,10 @@
 # chat/consumers.py
 import json
 
+from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-
+from .models import Notification
+from django.contrib.auth import get_user_model
 
 class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self): 
@@ -21,7 +23,8 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
+        message = text_data_json["message"] 
+
 
         # Send message to room group
         await self.channel_layer.group_send(
@@ -30,7 +33,15 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     # Receive message from room group
     async def chat_message(self, event):
-        message = event["message"] 
+        message = event["message"]  
 
+
+        await self.save_db(message)
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message}))
+        await self.send(text_data=json.dumps({"message": message})) 
+
+    async def save_db(self, message):  
+        recipient = await sync_to_async(get_user_model().objects.get)(username=self.room_name)
+        await sync_to_async(Notification.objects.create)(
+            recipient = recipient, 
+            message = message) 

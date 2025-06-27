@@ -43,8 +43,8 @@ function getCookie(name) {
 
 
         //pagination post page
+        let page = 1;
         window.addEventListener('scroll', () => {
-            let page = 1;
             const scrollY = window.scrollY || document.documentElement.scrollTop;
             const visibleHeight = window.innerHeight;
             const pageHeight = document.documentElement.scrollHeight;
@@ -53,7 +53,6 @@ function getCookie(name) {
 
                 page += 1 
                 let url = `${window.location.pathname}?page=${page}`;  
-                console.log(url)
                 
                 fetch(url, {
                     headers: {
@@ -64,25 +63,31 @@ function getCookie(name) {
                 .then(data => {
                     let cont = document.querySelector('.post-list'); 
                     cont.insertAdjacentHTML('beforeend', data.new_page)
+                    load_comment();
     
                 })
 
 
             }
         });
+//comment
+        const load_comment = () => {
+            const allComment = document.querySelectorAll('.modal_comment');
+            const twoLastComment = Array.from(allComment).filter(el => !el.dataset.loaded);
+            
+            twoLastComment.forEach(comment_block => { 
+            comment_block.dataset.loaded = "true"
 
-        
 
-        //comment 
-        document.querySelectorAll('.modal_comment').forEach(comment_block => { 
             let page_comment = 1 
             let object_id = comment_block.id; 
-              
+                    
             let next_page = true;
 
             const req_new_page_comment = () => { 
+
                 let url_comment = `/post/comment/${object_id}/?page=${page_comment}`
-                if (next_page){
+                if (next_page=== true){
 
                     fetch(url_comment) 
                     .then(response => response.json()) 
@@ -95,22 +100,21 @@ function getCookie(name) {
                         page_comment += 1 
                         });
             }};
-
-            req_new_page_comment(); 
+            req_new_page_comment()
             comment_block.addEventListener('click', event => { 
-                if(next_page){
-
+                if(next_page === true){
                     req_new_page_comment()
                 }
             })
+            
 
 
         
         });
-
+    }
         
  
-
+load_comment();
 
         //share 
         document.querySelectorAll('.share').forEach(shareBlock => { 
@@ -199,25 +203,52 @@ function getCookie(name) {
 
 
 
-// notification 
-        const roomName = JSON.parse(document.getElementById('room-name').textContent);
-        const chatSocket = new WebSocket(
-            'ws://'
-            + window.location.host
-            + '/ws/notification/'
-            + roomName
-            + '/'
-        );
+// notification websocet
+        // const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        // const chatSocket = new WebSocket(
+        //     'ws://'
+        //     + window.location.host
+        //     + '/ws/notification/'
+        //     + roomName
+        //     + '/'
+        // );
 
-        chatSocket.onmessage = function(e) {
-            const data = JSON.parse(e.data); 
-            alert(data.message)
-            let divNot = document.querySelector('.notification'); 
-            url = `/notification/${roomName}/`
-            divNot.innerHTML += `<a href=${url}><p>${data.message}</p></a>`
-        };
+        // chatSocket.onmessage = function(e) {
+        //     const data = JSON.parse(e.data); 
+        //     let divNot = document.querySelector('.notification'); 
+        //     url = `/notification/${roomName}/`
+        //     divNot.innerHTML += `<a href=${url}><p>${data.message}</p></a>`
+        // };
 
-        chatSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
-        };
+        // chatSocket.onclose = function(e) {
+        //     console.error('Chat socket closed unexpectedly');
+        // };
+
+
+
+// change hotofication status 
+
+
+let id_notif = [];
+const user = JSON.parse(document.getElementById('recipient').textContent);
+let updateStatusNotifUrl = `/notification/${user}/` 
+
+document.querySelectorAll('.status_False').forEach(notifElem => {
+    let notif_id =  notifElem.getAttribute('value');  
+    let data = {'id': Number(notif_id)}  
+    id_notif.push(data) 
+})
+fetch(updateStatusNotifUrl, {
+    method: 'PUT',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken') 
+    },
+    body: JSON.stringify(id_notif)
+    }
+)
+.then(responce => JSON(responce)) 
+.then(data => {
+   //change style block notification
+})
 

@@ -15,20 +15,18 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.cache import cache_page
 
 from rest_framework.views import APIView
-from .serializers import CommentSerialezers
+from .serializers import CommentSerialezers, PostChangeSerializer
 from rest_framework.response import Response 
 
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-
+from notification.permission import IsOwner
 
 
 
 @login_required()
 def list_post(request, username):  
-
-
 
     owner = User.objects.get(username=username)
     #list_posts = get_list_or_404(Post, owner=owner, status='Pb')[::-1]  
@@ -49,10 +47,13 @@ def list_post(request, username):
         return JsonResponse({"new_page": add_content})  
 
 
+    inst_forms = {} 
 
+    for post in page_obj: 
+        form = PostForm(instance=post)  
+        inst_forms[post.id] = form
     
-
-    context = {'list_posts': page_obj, "next_page": page_obj.has_next()}
+    context = {'list_posts': page_obj, "next_page": page_obj.has_next(), 'change_post_form': inst_forms}
 
     return render(request, 'post/list_post.html', context=context)
 
@@ -60,7 +61,6 @@ def list_post(request, username):
 
 def post(request, post_id): 
     post = Post.objects.get(id=post_id)  
-    
     if request.method == 'POST' : 
         data = json.loads(request.body) 
 
@@ -97,10 +97,24 @@ def post(request, post_id):
                 post=post,
             ) 
         elif action == 'share': 
-            pass
-     
+            pass  
 
-    return render(request, 'post/list_post.html') 
+    return render(request, 'post/list_post.html')  
+
+
+class ChangePostApi(APIView):  
+    permission_classes = [IsOwner]
+
+    def put(self, request, *args, **kwargs):  
+        form_data = request.data 
+        print(form_data)
+        
+        post_id = kwargs['post_id']  
+        serializer = PostChangeSerializer(data=form_data)   
+        if serializer.is_valid():  
+            instance = Post.objects.get(id=post_id) 
+            serializer.update(instance=instance, validated_data=serializer.validated_data)
+        return JsonResponse({"answer": 'your post updated'})
 
 
 
@@ -119,4 +133,6 @@ class CommentApiView(APIView):
 
         context = {"new_page_comment": page_comment, 'has_next_page': page_obj.has_next()}
 
-        return JsonResponse(context)
+        return JsonResponse(context) 
+    
+

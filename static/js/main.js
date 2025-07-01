@@ -203,52 +203,92 @@ load_comment();
 
 
 
-// notification websocet
-        // const roomName = JSON.parse(document.getElementById('room-name').textContent);
-        // const chatSocket = new WebSocket(
-        //     'ws://'
-        //     + window.location.host
-        //     + '/ws/notification/'
-        //     + roomName
-        //     + '/'
-        // );
+//notification websocet
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/notification/'
+            + roomName
+            + '/'
+        );
 
-        // chatSocket.onmessage = function(e) {
-        //     const data = JSON.parse(e.data); 
-        //     let divNot = document.querySelector('.notification'); 
-        //     url = `/notification/${roomName}/`
-        //     divNot.innerHTML += `<a href=${url}><p>${data.message}</p></a>`
-        // };
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data); 
+            let divNot = document.querySelector('.notification'); 
+            url = `/notification/${roomName}/`
+            divNot.innerHTML += `<a href=${url}><p>${data.message}</p></a>`
+        };
 
-        // chatSocket.onclose = function(e) {
-        //     console.error('Chat socket closed unexpectedly');
-        // };
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
 
 
 
 // change hotofication status 
-
-
-let id_notif = [];
 const user = JSON.parse(document.getElementById('recipient').textContent);
 let updateStatusNotifUrl = `/notification/${user}/` 
+if(window.location === updateStatusNotifUrl){
 
-document.querySelectorAll('.status_False').forEach(notifElem => {
-    let notif_id =  notifElem.getAttribute('value');  
-    let data = {'id': Number(notif_id)}  
-    id_notif.push(data) 
-})
-fetch(updateStatusNotifUrl, {
-    method: 'PUT',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCookie('csrftoken') 
-    },
-    body: JSON.stringify(id_notif)
+    let id_notif = [];
+    
+    
+    document.querySelectorAll('.status_False').forEach(notifElem => {
+        let notif_id =  notifElem.getAttribute('value');  
+        let data = {'id': Number(notif_id)}  
+        id_notif.push(data) 
+    })
+    fetch(updateStatusNotifUrl, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken') 
+        },
+        body: JSON.stringify(id_notif)
+        }
+    )
+    .then(responce => responce.json()) 
+    .then(data => {
+       //change style block notification
+    })
+}
+
+
+
+const changeContent = (url, data) => {
+    fetch(url, {
+        method: 'PUT',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }, 
+        body: data
+    }) 
+    .then(response => response.json()) 
+    .then(data => alert(data.answer))
+};
+
+document.querySelectorAll('.change_content_post').forEach(change_element => {
+    let post_id = change_element.querySelector('.show_form_change').id; 
+    let url = `/post/change-post/${post_id}/` 
+    let btn_send = change_element.querySelector('.send_change')  
+    
+    
+    btn_send.addEventListener('click', () =>  {
+        
+        let form = change_element.querySelector('.change_form_post');
+        console.log(form)
+
+        let formData = new FormData(form); 
+        //let data = Object.fromEntries(formData.entries());
+        console.log(formData) 
+        // console.log(data.text)
+        // console.log(data.photo)
+        // console.log(data.video)
+
+        changeContent(url, formData)
     }
-)
-.then(responce => JSON(responce)) 
-.then(data => {
-   //change style block notification
-})
+    )
 
+
+})

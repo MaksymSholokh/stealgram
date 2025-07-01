@@ -1,9 +1,16 @@
 {% load post_tags %}
 {% load cache %}
 
-{% for post in list_posts %}
+{% for post in list_posts %} 
             <div class="post">
-                <div class="post-header">
+                <div class="post-header"> 
+                    {% if request.user == post.owner %} 
+                        {% with obj=post %}
+                        
+                            {% include "includes/change_content.html" %}
+                        {% endwith %} 
+                    
+                    {% endif %}
                     <span class="post-owner">{{ post.owner }}</span>
                     <span class="post-time">{{ post.create_time }}</span>
                 </div>

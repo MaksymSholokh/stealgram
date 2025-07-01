@@ -1,0 +1,14 @@
+{% load post_tags %}
+<div class="change_content_post">
+
+
+
+    <button  class="show_form_change" id='{{obj.id}}'>Change</button>   
+    <div class="change_form"> 
+        <form class='change_form_post' method='put'>
+    
+            {{ change_post_form|get_item:obj.id}} 
+        </form>
+        <button class='send_change'>Send change</button>
+    </div>
+</div>

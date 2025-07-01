@@ -65,7 +65,9 @@
     <div class='notification'>
 
     </div>
-    {{ request.user.username|json_script:"room-name" }}
+    {{ request.user.username|json_script:"room-name" }} 
+    {{ request.user.username|json_script:"recipient" }}
+
 
     {% endblock footer %} 
 

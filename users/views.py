@@ -125,9 +125,7 @@ def profile_user(request, username):
     user = get_object_or_404(User, username=username) 
     profile = get_object_or_404(Profile, user=user) 
     friends  = list_friends(request.user)[:3] 
-    #print(request.user)
     draft_post, created = Post.published.get_or_create(owner=request.user)
-    #print(draft_post)
 
     if request.method == 'POST':  
         if request.content_type == 'application/json': 

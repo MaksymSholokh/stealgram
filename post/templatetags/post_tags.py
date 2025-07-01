@@ -15,4 +15,11 @@ def order_comment(comments, user):
     other_comments = comments.annotate(count_like=Count('like')).order_by('-count_like', '-created').exclude(owner=user) 
 
     all_comments =  list(chain(users_comments, other_comments))  
-    return all_comments
+    return all_comments 
+
+
+
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)

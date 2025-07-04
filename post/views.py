@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from notification.permission import IsOwner
-
+from .utils import instance_post
 
 
 @login_required()
@@ -41,17 +41,15 @@ def list_post(request, username):
 
     page_obj = paginator.get_page(page_number) 
 
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':  
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':   
+        inst_forms = instance_post(page_obj)
+        context={'list_posts': page_obj, 'change_post_form': inst_forms}
         
-        add_content = render_to_string('includes/post_list.html', context={'list_posts': page_obj}, request=request)  
+        add_content = render_to_string('includes/post_list.html', context=context, request=request)  
         return JsonResponse({"new_page": add_content})  
 
 
-    inst_forms = {} 
-
-    for post in page_obj: 
-        form = PostForm(instance=post)  
-        inst_forms[post.id] = form
+    inst_forms = instance_post(page_obj)
     
     context = {'list_posts': page_obj, "next_page": page_obj.has_next(), 'change_post_form': inst_forms}
 
@@ -107,7 +105,6 @@ class ChangePostApi(APIView):
 
     def put(self, request, *args, **kwargs):  
         form_data = request.data 
-        print(form_data)
         
         post_id = kwargs['post_id']  
         serializer = PostChangeSerializer(data=form_data)   

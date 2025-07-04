@@ -1,0 +1,36 @@
+{% extends "base.html" %} 
+{% load static %}
+
+
+{% block content %}
+    <div  class="allGroups"> 
+        <div class="followGroup"> 
+            
+            {% for follow_group in follow_groups %} 
+                <a href="{% url "group:group_name" follow_group.name %}">
+
+                    <p>{{follow_group.name}}</p>
+                </a>
+                <img src='{% static "follow_group.photo.url" %}'>
+            {% endfor %} 
+            {% if not follow_groups %}No groups to follow{% endif %}
+        </div>
+        
+        <div class="manageGroup">
+            {% for manage_group in manage_groups %} 
+                <a href="{% url "group:group_name" manage_group.name%}">
+
+                    <p>{{manage_group.name}}</p>
+                </a>
+                <img src='{{  manage_group.photo.url }}'>
+            {% endfor %}
+            {% if not manage_groups %}No groups to manage{% endif %}
+
+        </div>
+
+    </div>
+
+
+
+
+{% endblock content %}

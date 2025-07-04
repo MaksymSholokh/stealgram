@@ -52,7 +52,9 @@ function getCookie(name) {
             if (scrollY + visibleHeight >= pageHeight - 50) {
 
                 page += 1 
-                let url = `${window.location.pathname}?page=${page}`;  
+                let url = `${window.location.pathname}?page=${page}`;   
+                console.log(url)
+
                 
                 fetch(url, {
                     headers: {
@@ -255,7 +257,7 @@ if(window.location === updateStatusNotifUrl){
 }
 
 
-
+// change post data
 const changeContent = (url, data) => {
     fetch(url, {
         method: 'PUT',
@@ -280,11 +282,8 @@ document.querySelectorAll('.change_content_post').forEach(change_element => {
         console.log(form)
 
         let formData = new FormData(form); 
-        //let data = Object.fromEntries(formData.entries());
         console.log(formData) 
-        // console.log(data.text)
-        // console.log(data.photo)
-        // console.log(data.video)
+ 
 
         changeContent(url, formData)
     }

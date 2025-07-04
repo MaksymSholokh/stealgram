@@ -30,7 +30,8 @@ urlpatterns = [
     path('', include('main.urls', namespace='main')),
     path('post/', include('post.urls', namespace='post')),
 
-    path('notification/', include('notification.urls', namespace='notification')),
+    path('notification/', include('notification.urls', namespace='notification')), 
+    path('group/', include('groups.urls', namespace='group')),
 
 ] 
 

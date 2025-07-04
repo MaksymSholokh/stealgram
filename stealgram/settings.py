@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'chat.apps.ChatConfig', 
     'notification.apps.NotificationConfig',
+    'groups.apps.GroupsConfig',
 
     'channels', 
     'post.apps.PostConfig',
